@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — School Safety System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+    .hero {
+      background: #2d6a4f;
+      color: white;
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+    .hero h1 { font-size: 36px; margin-bottom: 10px; }
+    .hero p { font-size: 16px; opacity: 0.9; max-width: 500px; margin: 0 auto; }
+    .hero .tagline { font-size: 13px; opacity: 0.7; margin-top: 8px; }
+
+    .cards {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 20px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+      border-top: 4px solid #2d6a4f;
+    }
+    .card:hover { transform: translateY(-4px); }
+    .card.red { border-top-color: #e63946; }
+    .card.blue { border-top-color: #2196F3; }
+    .card.orange { border-top-color: #f4a261; }
+
+    .card .icon { font-size: 36px; margin-bottom: 12px; }
+    .card h2 { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: #777; line-height: 1.5; }
+
+    .who {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+    .who h2 { font-size: 18px; color: #2d6a4f; margin-bottom: 16px; text-align: center; }
+    .who-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .who-item { background: white; border-radius: 10px; padding: 16px; text-align: center; font-size: 13px; color: #555; }
+    .who-item .icon { font-size: 28px; margin-bottom: 8px; }
+    .who-item strong { display: block; color: #333; margin-bottom: 4px; font-size: 14px; }
+
+    .footer {
+      background: #2d6a4f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>🛡️ SafeTrack</h1>
+    <p>Keeping Nigerian school children safe — one scan at a time</p>
+    <div class="tagline">Real-time arrival, departure and pickup security for schools</div>
+  </div>
+
+  <div class="cards">
+
+    <a href="index.html" class="card">
+      <div class="icon">📋</div>
+      <h2>Register Student</h2>
+      <p>Add a new student and generate their unique QR code ID</p>
+    </a>
+
+    <a href="scanner.html" class="card red">
+      <div class="icon">📷</div>
+      <h2>Gate Scanner</h2>
+      <p>Scan student ID cards at arrival and departure</p>
+    </a>
+
+    <a href="pin-generator.html" class="card blue">
+      <div class="icon">🔐</div>
+      <h2>Generate PIN</h2>
+      <p>Parents generate a secure PIN for child pickup</p>
+    </a>
+
+    <a href="pin-verify.html" class="card orange">
+      <div class="icon">✅</div>
+      <h2>Verify PIN</h2>
+      <p>Staff verify pickup PIN at the school gate</p>
+    </a>
+
+  </div>
+
+  <div class="who">
+    <h2>Who uses SafeTrack?</h2>
+    <div class="who-grid">
+      <div class="who-item">
+        <div class="icon">🏫</div>
+        <strong>School Staff</strong>
+        Scan ID cards at the gate every morning and afternoon
+      </div>
+      <div class="who-item">
+        <div class="icon">👨‍👩‍👧</div>
+        <strong>Parents</strong>
+        Get notified when your child arrives or leaves school
+      </div>
+      <div class="who-item">
+        <div class="icon">🔒</div>
+        <strong>Security</strong>
+        Verify pickup PINs before releasing any child
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    SafeTrack — Built for Nigerian Schools 🇳🇬
+  </div>
+
+</body>
+</html>
