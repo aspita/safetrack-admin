@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Verify Pickup PIN</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+    h1 { color: #2d6a4f; font-size: 22px; text-align: center; }
+    p { text-align: center; color: #555; font-size: 14px; }
+    label { display: block; margin-top: 16px; font-weight: bold; font-size: 14px; }
+    input { width: 100%; padding: 14px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 22px; box-sizing: border-box; text-align: center; letter-spacing: 8px; }
+    button { margin-top: 24px; width: 100%; padding: 12px; background: #2d6a4f; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1b4332; }
+    #result { margin-top: 24px; padding: 20px; border-radius: 10px; display: none; text-align: center; }
+    .success { background: #d8f3dc; color: #1b4332; }
+    .error { background: #ffe5e5; color: #9b2226; }
+    #student-name { font-size: 24px; font-weight: bold; margin: 10px 0; }
+    #status-icon { font-size: 48px; }
+  </style>
+</head>
+<body>
+  <h1>SafeTrack — Gate Verification</h1>
+  <p>Enter the 6-digit PIN provided by the parent</p>
+
+  <label>Enter PIN</label>
+  <input type="number" id="pin_input" placeholder="000000" maxlength="6">
+
+  <button onclick="verifyPIN()">Verify PIN</button>
+
+  <div id="result">
+    <div id="status-icon"></div>
+    <div id="student-name"></div>
+    <div id="status-message"></div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(URL, KEY);
+
+    window.verifyPIN = async function() {
+      const pin = document.getElementById('pin_input').value.trim();
+
+      if (!pin || pin.length !== 6) {
+        alert('Please enter a valid 6-digit PIN.');
+        return;
+      }
+
+      const { data, error } = await db
+        .from('pickup_pins')
+        .select('*, students(*)')
+        .eq('pin_code', pin)
+        .eq('used', false)
+        .single();
+
+      const resultEl = document.getElementById('result');
+      const iconEl = document.getElementById('status-icon');
+      const nameEl = document.getElementById('student-name');
+      const msgEl = document.getElementById('status-message');
+
+      if (error || !data) {
+        iconEl.textContent = '❌';
+        nameEl.textContent = '';
+        msgEl.textContent = 'Invalid PIN! This PIN does not exist or has already been used.';
+        resultEl.className = 'error';
+        resultEl.style.display = 'block';
+        return;
+      }
+
+      const now = new Date();
+      const expires = new Date(data.expires_at);
+
+      if (now > expires) {
+        iconEl.textContent = '⏰';
+        nameEl.textContent = data.students.full_name;
+        msgEl.textContent = 'PIN has expired! Please ask the parent to generate a new one.';
+        resultEl.className = 'error';
+        resultEl.style.display = 'block';
+        return;
+      }
+
+      await db
+        .from('pickup_pins')
+        .update({ used: true })
+        .eq('id', data.id);
+
+      iconEl.textContent = '✅';
+      nameEl.textContent = data.students.full_name;
+      msgEl.textContent = `Access granted! ${data.students.full_name} can be released to the pickup person.`;
+      resultEl.className = 'success';
+      resultEl.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
