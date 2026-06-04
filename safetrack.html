@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Keeping Nigerian School Children Safe</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #fff; color: #333; }
+
+    /* NAV */
+    nav { background: #2d6a4f; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
+    nav .logo { color: white; font-size: 22px; font-weight: bold; }
+    nav a { color: white; text-decoration: none; font-size: 14px; margin-left: 24px; opacity: 0.9; }
+    nav a:hover { opacity: 1; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #2d6a4f, #1b4332); color: white; text-align: center; padding: 80px 20px; }
+    .hero h1 { font-size: 40px; margin-bottom: 16px; line-height: 1.2; }
+    .hero p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: 0 auto 32px; line-height: 1.6; }
+    .hero .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-white { background: white; color: #2d6a4f; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; }
+    .btn-outline { border: 2px solid white; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; }
+
+    /* STATS */
+    .stats { background: #f9f9f9; padding: 40px 20px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 700px; margin: 0 auto; gap: 20px; text-align: center; }
+    .stat-item .number { font-size: 36px; font-weight: bold; color: #2d6a4f; }
+    .stat-item .label { font-size: 14px; color: #777; margin-top: 4px; }
+
+    /* PROBLEM */
+    .problem { padding: 60px 20px; text-align: center; background: white; }
+    .problem h2 { font-size: 28px; color: #333; margin-bottom: 16px; }
+    .problem p { font-size: 16px; color: #555; max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+    /* FEATURES */
+    .features { background: #f9f9f9; padding: 60px 20px; }
+    .features h2 { font-size: 28px; text-align: center; margin-bottom: 40px; color: #333; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); max-width: 900px; margin: 0 auto; gap: 24px; }
+    .feature-card { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-top: 4px solid #2d6a4f; }
+    .feature-card .icon { font-size: 36px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 18px; margin-bottom: 8px; color: #2d6a4f; }
+    .feature-card p { font-size: 14px; color: #666; line-height: 1.6; }
+
+    /* HOW IT WORKS */
+    .how { padding: 60px 20px; background: white; }
+    .how h2 { font-size: 28px; text-align: center; margin-bottom: 40px; color: #333; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 900px; margin: 0 auto; gap: 20px; }
+    .step { text-align: center; padding: 20px; }
+    .step .num { width: 48px; height: 48px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin: 0 auto 12px; }
+    .step h3 { font-size: 15px; margin-bottom: 8px; color: #333; }
+    .step p { font-size: 13px; color: #777; line-height: 1.5; }
+
+    /* WHO */
+    .who { background: #f9f9f9; padding: 60px 20px; }
+    .who h2 { font-size: 28px; text-align: center; margin-bottom: 40px; color: #333; }
+    .who-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 700px; margin: 0 auto; gap: 20px; }
+    .who-card { background: white; border-radius: 12px; padding: 24px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .who-card .icon { font-size: 36px; margin-bottom: 12px; }
+    .who-card h3 { font-size: 16px; color: #2d6a4f; margin-bottom: 8px; }
+    .who-card p { font-size: 13px; color: #666; line-height: 1.5; }
+
+    /* SECURITY */
+    .security { background: #2d6a4f; color: white; padding: 60px 20px; text-align: center; }
+    .security h2 { font-size: 28px; margin-bottom: 16px; }
+    .security p { font-size: 16px; opacity: 0.9; max-width: 600px; margin: 0 auto 32px; line-height: 1.7; }
+    .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); max-width: 700px; margin: 0 auto; gap: 16px; }
+    .security-item { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; }
+    .security-item .icon { font-size: 28px; margin-bottom: 8px; }
+    .security-item p { font-size: 13px; opacity: 0.9; }
+
+    /* CONTACT */
+    .contact { padding: 60px 20px; background: white; text-align: center; }
+    .contact h2 { font-size: 28px; margin-bottom: 16px; color: #333; }
+    .contact p { font-size: 16px; color: #555; margin-bottom: 32px; }
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 600px; margin: 0 auto 32px; gap: 16px; }
+    .contact-item { background: #f9f9f9; border-radius: 10px; padding: 20px; }
+    .contact-item .icon { font-size: 28px; margin-bottom: 8px; }
+    .contact-item p { font-size: 14px; color: #555; }
+    .contact-item a { color: #2d6a4f; text-decoration: none; font-weight: bold; }
+    .cta-btn { display: inline-block; background: #2d6a4f; color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: bold; }
+
+    /* FOOTER */
+    footer { background: #1b4332; color: white; text-align: center; padding: 24px; font-size: 13px; opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">🛡️ SafeTrack</div>
+    <div>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#contact">Contact</a>
+      <a href="school-login.html">School Login</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Keeping Nigerian School<br>Children Safe 🇳🇬</h1>
+    <p>SafeTrack is a real-time school safety system that notifies parents the moment their child arrives or leaves school — and secures every pickup with a PIN.</p>
+    <div class="buttons">
+      <a href="school-login.html" class="btn-white">School Login</a>
+      <a href="#contact" class="btn-outline">Contact Us</a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="number">3</div>
+        <div class="label">Security Layers</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">30s</div>
+        <div class="label">Notification Speed</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">100%</div>
+        <div class="label">Made for Nigeria</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <div class="problem">
+    <h2>The Problem We Are Solving</h2>
+    <p>Every day, thousands of Nigerian parents send their children to school without knowing exactly when they arrived or who picked them up. SafeTrack changes that — giving parents real-time peace of mind and schools a powerful security tool.</p>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features" id="features">
+    <h2>What SafeTrack Does</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon">📷</div>
+        <h3>QR Code Scanning</h3>
+        <p>Each student has a unique QR code on their ID card. Staff scan it at the gate using any smartphone — no special equipment needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📱</div>
+        <h3>Instant Parent Notifications</h3>
+        <p>The moment a student is scanned, their parent receives an SMS and WhatsApp message with the exact time of arrival or departure.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔐</div>
+        <h3>Secure Pickup PIN</h3>
+        <p>When someone else picks up a child, the parent generates a secure 6-digit PIN valid for 30 minutes. Staff verify the PIN and the pickup person's name before releasing the child.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how" id="how">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>School Onboards</h3>
+        <p>We register the school and all students. Each student gets a unique QR code ID card.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Student Scans at Gate</h3>
+        <p>Staff scan the student's ID card QR code when they arrive or leave school.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Parent Gets Notified</h3>
+        <p>Parent instantly receives SMS and WhatsApp message with the time and school name.</p>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <h3>Pickup is Secured</h3>
+        <p>Parent generates a PIN for the pickup person. Staff verify PIN and name before releasing child.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHO -->
+  <div class="who">
+    <h2>Who Uses SafeTrack?</h2>
+    <div class="who-grid">
+      <div class="who-card">
+        <div class="icon">🏫</div>
+        <h3>Primary Schools</h3>
+        <p>Keep young children safe with real-time gate monitoring and secure pickup verification.</p>
+      </div>
+      <div class="who-card">
+        <div class="icon">🎓</div>
+        <h3>Secondary Schools</h3>
+        <p>Monitor student arrivals and departures while giving parents complete visibility.</p>
+      </div>
+      <div class="who-card">
+        <div class="icon">👨‍👩‍👧</div>
+        <h3>Parents</h3>
+        <p>Know exactly when your child arrives and leaves school every single day.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="security">
+    <h2>Three Layers of Security</h2>
+    <p>SafeTrack is the only school safety system in Nigeria with three independent security layers protecting every child.</p>
+    <div class="security-grid">
+      <div class="security-item">
+        <div class="icon">🪪</div>
+        <p><strong>QR Code</strong><br>Unique to every student. Cannot be duplicated.</p>
+      </div>
+      <div class="security-item">
+        <div class="icon">⏱️</div>
+        <p><strong>Time-Limited PIN</strong><br>Expires in 30 minutes. Cannot be reused.</p>
+      </div>
+      <div class="security-item">
+        <div class="icon">👤</div>
+        <p><strong>Name Verification</strong><br>Staff confirm pickup person's name matches the PIN.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="contact" id="contact">
+    <h2>Get SafeTrack for Your School</h2>
+    <p>We onboard schools manually to ensure everything is set up perfectly. Contact us today to get started.</p>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="icon">📧</div>
+        <p>Email<br><a href="mailto:info@aspitaprobs.com">info@aspitaprobs.com</a></p>
+      </div>
+      <div class="contact-item">
+        <div class="icon">📱</div>
+        <p>WhatsApp<br><a href="https://wa.me/2348012345678">Chat with us</a></p>
+      </div>
+      <div class="contact-item">
+        <div class="icon">📍</div>
+        <p>Location<br>Lagos, Nigeria 🇳🇬</p>
+      </div>
+    </div>
+    <a href="mailto:info@aspitaprobs.com" class="cta-btn">Contact Us Today</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2026 SafeTrack by Aspita Probs Limited — Keeping Nigerian School Children Safe 🇳🇬
+  </footer>
+
+</body>
+</html>
