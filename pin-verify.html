@@ -89,7 +89,7 @@
 
       iconEl.textContent = '✅';
       nameEl.textContent = data.students.full_name;
-      msgEl.textContent = `Access granted! ${data.students.full_name} can be released to the pickup person.`;
+      msgEl.textContent = `Access granted! Release ${data.students.full_name} to ${data.pickup_name}.`;
       resultEl.className = 'success';
       resultEl.style.display = 'block';
     }
