@@ -62,6 +62,11 @@
     </div>
 
     <div class="section">
+     <div style="margin-bottom:16px; display:flex; gap:10px; align-items:center;">
+  <label style="font-weight:bold; font-size:14px;">Filter by date:</label>
+  <input type="date" id="date-filter" style="padding:8px; border:1px solid #ccc; border-radius:6px; font-size:14px;" onchange="filterByDate()">
+  <button onclick="clearFilter()" style="padding:8px 16px; background:#2d6a4f; color:white; border:none; border-radius:6px; cursor:pointer;">Today</button>
+</div>
       <div class="tabs">
         <button class="tab active" id="tab-btn-attendance" onclick="showTab('attendance')">Today's Attendance</button>
         <button class="tab" id="tab-btn-students" onclick="showTab('students')">All Students</button>
@@ -73,8 +78,9 @@
             <thead>
               <tr>
                 <th>Student Name</th>
-                <th>Type</th>
-                <th>Time</th>
+<th>Type</th>
+<th>Date</th>
+<th>Time</th>
               </tr>
             </thead>
             <tbody id="attendance-body">
@@ -177,17 +183,25 @@
 
           if (logs && logs.length > 0) {
             logs.forEach(log => {
-              const time = new Date(log.scanned_at).toLocaleTimeString('en-NG', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-              });
-              attendanceBody.innerHTML += `
-                <tr>
-                  <td>${log.students ? log.students.full_name : 'Unknown'}</td>
-                  <td><span class="badge ${log.scan_type}">${log.scan_type}</span></td>
-                  <td>${time}</td>
-                </tr>`;
+             const scanDate = new Date(log.scanned_at);
+const time = scanDate.toLocaleTimeString('en-NG', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true
+});
+const date = scanDate.toLocaleDateString('en-NG', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+});
+attendanceBody.innerHTML += `
+  <tr>
+    <td>${log.students ? log.students.full_name : 'Unknown'}</td>
+    <td><span class="badge ${log.scan_type}">${log.scan_type}</span></td>
+    <td>${date}</td>
+    <td>${time}</td>
+  </tr>`;
             });
           } else {
             attendanceBody.innerHTML = '<tr><td colspan="3" class="empty">No attendance recorded today</td></tr>';
@@ -222,7 +236,57 @@
       localStorage.removeItem('school_name');
       window.location.href = 'school-login.html';
     }
+window.filterByDate = async function() {
+  const dateValue = document.getElementById('date-filter').value;
+  if (!dateValue) return;
 
+  const { data: students } = await db
+    .from('students')
+    .select('*')
+    .eq('school_id', parseInt(schoolId));
+
+  const studentIds = students ? students.map(s => s.id) : [];
+
+  const startDate = new Date(dateValue).toISOString();
+  const endDate = new Date(new Date(dateValue).getTime() + 86400000).toISOString();
+
+  const { data: logs } = await db
+    .from('attendance_logs')
+    .select('*, students(*)')
+    .in('student_id', studentIds)
+    .gte('scanned_at', startDate)
+    .lt('scanned_at', endDate)
+    .order('scanned_at', { ascending: false });
+
+  const attendanceBody = document.getElementById('attendance-body');
+  attendanceBody.innerHTML = '';
+
+  if (logs && logs.length > 0) {
+    logs.forEach(log => {
+      const scanDate = new Date(log.scanned_at);
+      const time = scanDate.toLocaleTimeString('en-NG', {
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+      const date = scanDate.toLocaleDateString('en-NG', {
+        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+      });
+      attendanceBody.innerHTML += `
+        <tr>
+          <td>${log.students ? log.students.full_name : 'Unknown'}</td>
+          <td><span class="badge ${log.scan_type}">${log.scan_type}</span></td>
+          <td>${date}</td>
+          <td>${time}</td>
+        </tr>`;
+    });
+  } else {
+    attendanceBody.innerHTML = '<tr><td colspan="4" class="empty">No attendance recorded for this date</td></tr>';
+  }
+}
+
+window.clearFilter = function() {
+  document.getElementById('date-filter').value = '';
+  loadDashboard();
+}
     loadDashboard();
   </script>
 </body>
