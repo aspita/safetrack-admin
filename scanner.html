@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; background: #f5f5f5; }
+    h1 { color: #2d6a4f; font-size: 22px; text-align: center; }
+    #reader { width: 100%; margin: 20px 0; border-radius: 10px; overflow: hidden; }
+    #result { margin-top: 20px; padding: 16px; border-radius: 8px; font-size: 15px; display: none; text-align: center; }
+    .success { background: #d8f3dc; color: #1b4332; }
+    .error { background: #ffe5e5; color: #9b2226; }
+    .buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+    button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; color: white; }
+    #btn-arrival { background: #2d6a4f; }
+    #btn-departure { background: #e63946; }
+    button.active { outline: 3px solid #000; }
+    #scan-mode { text-align: center; font-size: 14px; color: #555; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>SafeTrack — Gate Scanner</h1>
+
+  <div class="buttons">
+    <button id="btn-arrival" onclick="setMode('arrival')">Arrival</button>
+    <button id="btn-departure" onclick="setMode('departure')">Departure</button>
+  </div>
+
+  <div id="scan-mode">Mode: <strong id="mode-label">Arrival</strong></div>
+
+  <div id="reader"></div>
+  <div id="result"></div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(URL, KEY);
+
+    let currentMode = 'arrival';
+    let scanning = true;
+
+    window.setMode = function(mode) {
+      currentMode = mode;
+      document.getElementById('mode-label').textContent = mode === 'arrival' ? 'Arrival' : 'Departure';
+      document.getElementById('btn-arrival').classList.toggle('active', mode === 'arrival');
+      document.getElementById('btn-departure').classList.toggle('active', mode === 'departure');
+    }
+
+    function showResult(text, type) {
+      const el = document.getElementById('result');
+      el.textContent = text;
+      el.className = type;
+      el.style.display = 'block';
+      setTimeout(() => {
+        el.style.display = 'none';
+        scanning = true;
+      }, 4000);
+    }
+
+    async function onScan(qrCode) {
+      if (!scanning) return;
+      scanning = false;
+
+      const { data, error } = await db
+        .from('students')
+        .select('*')
+        .eq('qr_code', qrCode)
+        .single();
+
+      if (error || !data) {
+        showResult('Student not found! Please check the ID card.', 'error');
+        return;
+      }
+
+      const { error: logError } = await db.from('attendance_logs').insert([{
+        student_id: data.id,
+        scan_type: currentMode,
+        scanned_at: new Date().toISOString()
+      }]);
+
+      if (logError) {
+        showResult('Error logging attendance: ' + logError.message, 'error');
+      } else {
+        const time = new Date().toLocaleTimeString();
+        showResult(
+          currentMode === 'arrival'
+            ? `✓ ${data.full_name} arrived at ${time}`
+            : `✓ ${data.full_name} departed at ${time}`,
+          'success'
+        );
+      }
+    }
+
+    const scanner = new Html5Qrcode("reader");
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      onScan,
+      () => {}
+    );
+
+    window.setMode('arrival');
+  </script>
+</body>
+</html>
