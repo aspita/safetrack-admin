@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Add Student</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+    h1 { color: #2d6a4f; font-size: 22px; }
+    label { display: block; margin-top: 16px; font-weight: bold; font-size: 14px; }
+    input { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+    button { margin-top: 24px; width: 100%; padding: 12px; background: #2d6a4f; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1b4332; }
+    #message { margin-top: 16px; padding: 12px; border-radius: 6px; font-size: 14px; display: none; }
+    .success { background: #d8f3dc; color: #1b4332; }
+    .error { background: #ffe5e5; color: #9b2226; }
+  </style>
+</head>
+<body>
+  <h1>SafeTrack — Register Student</h1>
+
+  <label>Full Name</label>
+  <input type="text" id="full_name" placeholder="e.g. Amaka Okonkwo">
+
+  <label>Class</label>
+  <input type="text" id="class" placeholder="e.g. JSS 2A">
+
+  <label>School Name</label>
+  <input type="text" id="school_name" placeholder="e.g. Greenfield Academy">
+
+  <label>Parent Phone (SMS)</label>
+  <input type="text" id="parent_phone" placeholder="e.g. 08012345678">
+
+  <label>Parent WhatsApp Number</label>
+  <input type="text" id="parent_whatsapp" placeholder="e.g. 08012345678">
+
+  <button onclick="addStudent()">Register Student</button>
+
+  <div id="message"></div>
+
+  <script>
+  const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function addStudent() {
+      const full_name = document.getElementById('full_name').value.trim();
+      const cls = document.getElementById('class').value.trim();
+      const school_name = document.getElementById('school_name').value.trim();
+      const parent_phone = document.getElementById('parent_phone').value.trim();
+      const parent_whatsapp = document.getElementById('parent_whatsapp').value.trim();
+
+      if (!full_name || !cls || !school_name || !parent_phone || !parent_whatsapp) {
+        showMessage('Please fill in all fields.', 'error');
+        return;
+      }
+
+      const qr_code = 'ST-' + Date.now();
+
+      const { error } = await supabase.from('students').insert([{
+        full_name, class: cls, school_name,
+        parent_phone, parent_whatsapp, qr_code
+      }]);
+
+      if (error) {
+        showMessage('Error: ' + error.message, 'error');
+      } else {
+        showMessage('✓ Student registered successfully! QR code: ' + qr_code, 'success');
+        document.querySelectorAll('input').forEach(i => i.value = '');
+      }
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = type;
+      msg.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+
