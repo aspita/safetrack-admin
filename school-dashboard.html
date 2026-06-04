@@ -34,7 +34,8 @@
 
   <div class="header">
     <h1>🛡️ <span id="school-title">School Dashboard</span></h1>
-    <button onclick="logout()">Logout</button>
+    <button onclick="goToRegister()" style="margin-right:8px; background:rgba(255,255,255,0.9); color:#2d6a4f;">+ Add Student</button>
+<button onclick="logout()">Logout</button>
   </div>
 
   <div id="loading">Loading your dashboard...</div>
@@ -179,7 +180,10 @@
       event.target.classList.add('active');
     }
 
-    window.logout = function() {
+    window.goToRegister = function() {
+  window.location.href = 'index.html';
+}
+   window.logout = function() {
       localStorage.removeItem('school_id');
       localStorage.removeItem('school_name');
       window.location.href = 'school-login.html';
