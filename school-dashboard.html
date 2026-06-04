@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — School Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    .header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 20px; }
+    .header button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 20px; }
+    .stat { background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat .number { font-size: 32px; font-weight: bold; color: #2d6a4f; }
+    .stat .label { font-size: 12px; color: #777; margin-top: 4px; }
+    .section { padding: 0 20px 20px; }
+    .section h2 { font-size: 16px; color: #333; margin-bottom: 12px; }
+    .table-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #2d6a4f; color: white; padding: 10px 12px; text-align: left; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+    tr:last-child td { border-bottom: none; }
+    .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+    .arrival { background: #d8f3dc; color: #1b4332; }
+    .departure { background: #ffe5e5; color: #9b2226; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; background: white; color: #555; }
+    .tab.active { background: #2d6a4f; color: white; }
+    #loading { text-align: center; padding: 40px; color: #777; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🛡️ <span id="school-title">School Dashboard</span></h1>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div id="loading">Loading your dashboard...</div>
+
+  <div id="content" style="display:none">
+    <div class="stats">
+      <div class="stat">
+        <div class="number" id="total-students">0</div>
+        <div class="label">Total Students</div>
+      </div>
+      <div class="stat">
+        <div class="number" id="today-arrivals">0</div>
+        <div class="label">Arrived Today</div>
+      </div>
+      <div class="stat">
+        <div class="number" id="today-departures">0</div>
+        <div class="label">Departed Today</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('attendance')">Today's Attendance</button>
+        <button class="tab" onclick="showTab('students')">All Students</button>
+      </div>
+
+      <div id="tab-attendance">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Type</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-students" style="display:none">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Class</th>
+                <th>Parent Phone</th>
+                <th>QR Code</th>
+              </tr>
+            </thead>
+            <tbody id="students-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(URL, KEY);
+
+    const schoolId = localStorage.getItem('school_id');
+    const schoolName = localStorage.getItem('school_name');
+
+    if (!schoolId) {
+      window.location.href = 'school-login.html';
+    }
+
+    document.getElementById('school-title').textContent = schoolName;
+
+    async function loadDashboard() {
+      const { data: students } = await db
+        .from('students')
+        .select('*')
+        .eq('school_id', schoolId);
+
+      document.getElementById('total-students').textContent = students ? students.length : 0;
+
+      const studentsBody = document.getElementById('students-body');
+      studentsBody.innerHTML = '';
+      if (students) {
+        students.forEach(s => {
+          studentsBody.innerHTML += `
+            <tr>
+              <td>${s.full_name}</td>
+              <td>${s.class}</td>
+              <td>${s.parent_phone}</td>
+              <td style="font-size:11px">${s.qr_code}</td>
+            </tr>`;
+        });
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      const studentIds = students ? students.map(s => s.id) : [];
+
+      if (studentIds.length > 0) {
+        const { data: logs } = await db
+          .from('attendance_logs')
+          .select('*, students(*)')
+          .in('student_id', studentIds)
+          .gte('scanned_at', today + 'T00:00:00')
+          .order('scanned_at', { ascending: false });
+
+        const arrivals = logs ? logs.filter(l => l.scan_type === 'arrival') : [];
+        const departures = logs ? logs.filter(l => l.scan_type === 'departure') : [];
+
+        document.getElementById('today-arrivals').textContent = arrivals.length;
+        document.getElementById('today-departures').textContent = departures.length;
+
+        const attendanceBody = document.getElementById('attendance-body');
+        attendanceBody.innerHTML = '';
+        if (logs && logs.length > 0) {
+          logs.forEach(log => {
+            const time = new Date(log.scanned_at).toLocaleTimeString();
+            attendanceBody.innerHTML += `
+              <tr>
+                <td>${log.students.full_name}</td>
+                <td><span class="badge ${log.scan_type}">${log.scan_type}</span></td>
+                <td>${time}</td>
+              </tr>`;
+          });
+        } else {
+          attendanceBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#777;padding:20px">No attendance recorded today</td></tr>';
+        }
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    window.showTab = function(tab) {
+      document.getElementById('tab-attendance').style.display = tab === 'attendance' ? 'block' : 'none';
+      document.getElementById('tab-students').style.display = tab === 'students' ? 'block' : 'none';
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    window.logout = function() {
+      localStorage.removeItem('school_id');
+      localStorage.removeItem('school_name');
+      window.location.href = 'school-login.html';
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
