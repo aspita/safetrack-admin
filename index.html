@@ -58,18 +58,27 @@
       }
 
       const qr_code = 'ST-' + Date.now();
+const school_id = localStorage.getItem('school_id');
+if (!school_id) {
+  showMessage('Please login through your school portal first.', 'error');
+  return;
+}
 
-      const { error } = await db.from('students').insert([{
-        full_name, class: cls, school_name,
-        parent_phone, parent_whatsapp, qr_code
-      }]);
+     const { error } = await db.from('students').insert([{
+  full_name, class: cls, school_name,
+  parent_phone, parent_whatsapp, qr_code,
+  school_id: parseInt(school_id)
+}]);
 
       if (error) {
-        showMessage('Error: ' + error.message, 'error');
-      } else {
-        showMessage('Student registered! QR code: ' + qr_code, 'success');
-        document.querySelectorAll('input').forEach(i => i.value = '');
-      }
+  showMessage('Error: ' + error.message, 'error');
+} else {
+  showMessage('Student registered! QR code: ' + qr_code, 'success');
+  document.querySelectorAll('input').forEach(i => i.value = '');
+  setTimeout(() => {
+    window.location.href = 'school-dashboard.html';
+  }, 2000);
+}
     }
   </script>
 </body>
