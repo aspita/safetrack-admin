@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Generate Pickup PIN</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+    h1 { color: #2d6a4f; font-size: 22px; text-align: center; }
+    label { display: block; margin-top: 16px; font-weight: bold; font-size: 14px; }
+    input, select { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+    button { margin-top: 24px; width: 100%; padding: 12px; background: #2d6a4f; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1b4332; }
+    #result { margin-top: 24px; padding: 20px; border-radius: 10px; display: none; text-align: center; background: #d8f3dc; color: #1b4332; }
+    #pin-display { font-size: 48px; font-weight: bold; letter-spacing: 8px; margin: 10px 0; color: #1b4332; }
+    #timer { font-size: 14px; color: #555; margin-top: 8px; }
+    #expires { font-size: 13px; color: #888; }
+    .error { background: #ffe5e5 !important; color: #9b2226 !important; }
+  </style>
+</head>
+<body>
+  <h1>SafeTrack — Pickup PIN</h1>
+  <p style="text-align:center; color:#555; font-size:14px;">Generate a secure PIN to authorise someone to pick up your child</p>
+
+  <label>Your Child's QR Code</label>
+  <input type="text" id="qr_code" placeholder="e.g. ST-1780551394600">
+
+  <label>Pickup Person's Name</label>
+  <input type="text" id="pickup_name" placeholder="e.g. Uncle Emeka">
+
+  <button onclick="generatePIN()">Generate PIN</button>
+
+  <div id="result">
+    <div>PIN for pickup:</div>
+    <div id="pin-display"></div>
+    <div id="expires"></div>
+    <div id="timer"></div>
+    <p style="font-size:13px; margin-top:12px;">Share this PIN with <strong id="pickup-person"></strong>.<br>They must show it at the school gate.</p>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(URL, KEY);
+
+    let countdown;
+
+    window.generatePIN = async function() {
+      const qr_code = document.getElementById('qr_code').value.trim();
+      const pickup_name = document.getElementById('pickup_name').value.trim();
+
+      if (!qr_code || !pickup_name) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      const { data, error } = await db
+        .from('students')
+        .select('*')
+        .eq('qr_code', qr_code)
+        .single();
+
+      if (error || !data) {
+        alert('Student not found! Please check the QR code.');
+        return;
+      }
+
+      const pin = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+
+      const { error: pinError } = await db.from('pickup_pins').insert([{
+        student_id: data.id,
+        pin_code: pin,
+        expires_at: expiresAt.toISOString(),
+        used: false
+      }]);
+
+      if (pinError) {
+        alert('Error generating PIN: ' + pinError.message);
+        return;
+      }
+
+      document.getElementById('pin-display').textContent = pin;
+      document.getElementById('pickup-person').textContent = pickup_name;
+      document.getElementById('expires').textContent = 'Expires at: ' + expiresAt.toLocaleTimeString();
+      document.getElementById('result').style.display = 'block';
+
+      if (countdown) clearInterval(countdown);
+      let secondsLeft = 30 * 60;
+      const timerEl = document.getElementById('timer');
+
+      countdown = setInterval(() => {
+        secondsLeft--;
+        const mins = Math.floor(secondsLeft / 60);
+        const secs = secondsLeft % 60;
+        timerEl.textContent = `Time remaining: ${mins}:${secs.toString().padStart(2, '0')}`;
+        if (secondsLeft <= 0) {
+          clearInterval(countdown);
+          timerEl.textContent = 'PIN has expired!';
+          document.getElementById('result').classList.add('error');
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
