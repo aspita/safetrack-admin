@@ -18,52 +18,38 @@
   </style>
 </head>
 <body>
-  <h1>SafeTrack — Register Student</h1>
-
+  <h1>SafeTrack — Register Student v2</h1>
   <label>Full Name</label>
   <input type="text" id="full_name" placeholder="e.g. Amaka Okonkwo">
-
   <label>Class</label>
   <input type="text" id="class" placeholder="e.g. JSS 2A">
-
   <label>School Name</label>
   <input type="text" id="school_name" placeholder="e.g. Greenfield Academy">
-
   <label>Parent Phone (SMS)</label>
   <input type="text" id="parent_phone" placeholder="e.g. 08012345678">
-
   <label>Parent WhatsApp Number</label>
   <input type="text" id="parent_whatsapp" placeholder="e.g. 08012345678">
-
   <button onclick="addStudent()">Register Student</button>
-
   <div id="message"></div>
-
   <script>
-  const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
-
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     async function addStudent() {
       const full_name = document.getElementById('full_name').value.trim();
       const cls = document.getElementById('class').value.trim();
       const school_name = document.getElementById('school_name').value.trim();
       const parent_phone = document.getElementById('parent_phone').value.trim();
       const parent_whatsapp = document.getElementById('parent_whatsapp').value.trim();
-
       if (!full_name || !cls || !school_name || !parent_phone || !parent_whatsapp) {
         showMessage('Please fill in all fields.', 'error');
         return;
       }
-
       const qr_code = 'ST-' + Date.now();
-
       const { error } = await supabase.from('students').insert([{
         full_name, class: cls, school_name,
         parent_phone, parent_whatsapp, qr_code
       }]);
-
       if (error) {
         showMessage('Error: ' + error.message, 'error');
       } else {
@@ -71,7 +57,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
         document.querySelectorAll('input').forEach(i => i.value = '');
       }
     }
-
     function showMessage(text, type) {
       const msg = document.getElementById('message');
       msg.textContent = text;
@@ -81,4 +66,3 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
   </script>
 </body>
 </html>
-
