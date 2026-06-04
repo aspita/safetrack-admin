@@ -7,15 +7,20 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #f5f5f5; }
-    .header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
     .header h1 { font-size: 20px; }
-    .header button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .header-buttons { display: flex; gap: 8px; }
+    .header button { color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .btn-add { background: rgba(255,255,255,0.9) !important; color: #2d6a4f !important; font-weight: bold; }
+    .btn-logout { background: rgba(255,255,255,0.2); }
     .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 20px; }
     .stat { background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .stat .number { font-size: 32px; font-weight: bold; color: #2d6a4f; }
     .stat .label { font-size: 12px; color: #777; margin-top: 4px; }
     .section { padding: 0 20px 20px; }
-    .section h2 { font-size: 16px; color: #333; margin-bottom: 12px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; background: white; color: #555; }
+    .tab.active { background: #2d6a4f; color: white; }
     .table-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { background: #2d6a4f; color: white; padding: 10px 12px; text-align: left; }
@@ -24,18 +29,18 @@
     .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
     .arrival { background: #d8f3dc; color: #1b4332; }
     .departure { background: #ffe5e5; color: #9b2226; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tab { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; background: white; color: #555; }
-    .tab.active { background: #2d6a4f; color: white; }
-    #loading { text-align: center; padding: 40px; color: #777; }
+    #loading { text-align: center; padding: 40px; color: #777; font-size: 16px; }
+    .empty { text-align: center; color: #777; padding: 30px; font-size: 14px; }
   </style>
 </head>
 <body>
 
   <div class="header">
     <h1>🛡️ <span id="school-title">School Dashboard</span></h1>
-    <button onclick="goToRegister()" style="margin-right:8px; background:rgba(255,255,255,0.9); color:#2d6a4f;">+ Add Student</button>
-<button onclick="logout()">Logout</button>
+    <div class="header-buttons">
+      <button class="btn-add" onclick="goToRegister()">+ Add Student</button>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
   </div>
 
   <div id="loading">Loading your dashboard...</div>
@@ -58,8 +63,8 @@
 
     <div class="section">
       <div class="tabs">
-        <button class="tab active" onclick="showTab('attendance')">Today's Attendance</button>
-        <button class="tab" onclick="showTab('students')">All Students</button>
+        <button class="tab active" id="tab-btn-attendance" onclick="showTab('attendance')">Today's Attendance</button>
+        <button class="tab" id="tab-btn-students" onclick="showTab('students')">All Students</button>
       </div>
 
       <div id="tab-attendance">
@@ -114,76 +119,105 @@
     document.getElementById('school-title').textContent = schoolName;
 
     async function loadDashboard() {
-      const { data: students } = await db
-        .from('students')
-        .select('*')
-        .eq('school_id', schoolId);
+      try {
+        // Load all students for this school
+        const { data: students, error: studentsError } = await db
+          .from('students')
+          .select('*')
+          .eq('school_id', parseInt(schoolId));
 
-      document.getElementById('total-students').textContent = students ? students.length : 0;
+        if (studentsError) throw studentsError;
 
-      const studentsBody = document.getElementById('students-body');
-      studentsBody.innerHTML = '';
-      if (students) {
-        students.forEach(s => {
-          studentsBody.innerHTML += `
-            <tr>
-              <td>${s.full_name}</td>
-              <td>${s.class}</td>
-              <td>${s.parent_phone}</td>
-              <td style="font-size:11px">${s.qr_code}</td>
-            </tr>`;
-        });
-      }
+        const totalStudents = students ? students.length : 0;
+        document.getElementById('total-students').textContent = totalStudents;
 
-      const today = new Date().toISOString().split('T')[0];
-      const studentIds = students ? students.map(s => s.id) : [];
-
-      if (studentIds.length > 0) {
-        const { data: logs } = await db
-          .from('attendance_logs')
-          .select('*, students(*)')
-          .in('student_id', studentIds)
-          .gte('scanned_at', today + 'T00:00:00')
-          .order('scanned_at', { ascending: false });
-
-        const arrivals = logs ? logs.filter(l => l.scan_type === 'arrival') : [];
-        const departures = logs ? logs.filter(l => l.scan_type === 'departure') : [];
-
-        document.getElementById('today-arrivals').textContent = arrivals.length;
-        document.getElementById('today-departures').textContent = departures.length;
-
-        const attendanceBody = document.getElementById('attendance-body');
-        attendanceBody.innerHTML = '';
-        if (logs && logs.length > 0) {
-          logs.forEach(log => {
-            const time = new Date(log.scanned_at).toLocaleTimeString();
-            attendanceBody.innerHTML += `
+        // Populate students table
+        const studentsBody = document.getElementById('students-body');
+        studentsBody.innerHTML = '';
+        if (students && students.length > 0) {
+          students.forEach(s => {
+            studentsBody.innerHTML += `
               <tr>
-                <td>${log.students.full_name}</td>
-                <td><span class="badge ${log.scan_type}">${log.scan_type}</span></td>
-                <td>${time}</td>
+                <td>${s.full_name}</td>
+                <td>${s.class || ''}</td>
+                <td>${s.parent_phone || ''}</td>
+                <td style="font-size:11px;color:#777">${s.qr_code}</td>
               </tr>`;
           });
         } else {
-          attendanceBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#777;padding:20px">No attendance recorded today</td></tr>';
+          studentsBody.innerHTML = '<tr><td colspan="4" class="empty">No students registered yet</td></tr>';
         }
-      }
 
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
+        // Get today's attendance for this school's students
+        if (students && students.length > 0) {
+          const studentIds = students.map(s => s.id);
+
+          const today = new Date();
+          const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+          const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+
+          const { data: logs, error: logsError } = await db
+            .from('attendance_logs')
+            .select('*, students(*)')
+            .in('student_id', studentIds)
+            .gte('scanned_at', todayStart)
+            .lt('scanned_at', todayEnd)
+            .order('scanned_at', { ascending: false });
+
+          if (logsError) throw logsError;
+
+          const arrivals = logs ? logs.filter(l => l.scan_type === 'arrival') : [];
+          const departures = logs ? logs.filter(l => l.scan_type === 'departure') : [];
+
+          document.getElementById('today-arrivals').textContent = arrivals.length;
+          document.getElementById('today-departures').textContent = departures.length;
+
+          const attendanceBody = document.getElementById('attendance-body');
+          attendanceBody.innerHTML = '';
+
+          if (logs && logs.length > 0) {
+            logs.forEach(log => {
+              const time = new Date(log.scanned_at).toLocaleTimeString('en-NG', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              });
+              attendanceBody.innerHTML += `
+                <tr>
+                  <td>${log.students ? log.students.full_name : 'Unknown'}</td>
+                  <td><span class="badge ${log.scan_type}">${log.scan_type}</span></td>
+                  <td>${time}</td>
+                </tr>`;
+            });
+          } else {
+            attendanceBody.innerHTML = '<tr><td colspan="3" class="empty">No attendance recorded today</td></tr>';
+          }
+        } else {
+          document.getElementById('today-arrivals').textContent = '0';
+          document.getElementById('today-departures').textContent = '0';
+          document.getElementById('attendance-body').innerHTML = '<tr><td colspan="3" class="empty">No students registered yet</td></tr>';
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('loading').textContent = 'Error loading dashboard: ' + err.message;
+      }
     }
 
     window.showTab = function(tab) {
       document.getElementById('tab-attendance').style.display = tab === 'attendance' ? 'block' : 'none';
       document.getElementById('tab-students').style.display = tab === 'students' ? 'block' : 'none';
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      document.getElementById('tab-btn-attendance').classList.toggle('active', tab === 'attendance');
+      document.getElementById('tab-btn-students').classList.toggle('active', tab === 'students');
     }
 
     window.goToRegister = function() {
-  window.location.href = 'index.html';
-}
-   window.logout = function() {
+      window.location.href = 'index.html';
+    }
+
+    window.logout = function() {
       localStorage.removeItem('school_id');
       localStorage.removeItem('school_name');
       window.location.href = 'school-login.html';
