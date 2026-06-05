@@ -9,8 +9,7 @@
     body { font-family: Arial, sans-serif; background: #f5f5f5; }
     .header { background: #1b4332; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
     .header h1 { font-size: 20px; }
-    .header-right { display: flex; gap: 8px; align-items: center; }
-    .badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 12px; font-size: 12px; }
+    .badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-right: 8px; }
     .header button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px; }
     .stat { background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 4px solid #1b4332; }
@@ -19,7 +18,8 @@
     .section { padding: 0 20px 20px; }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .section-header h2 { font-size: 16px; color: #333; }
-    .btn-add { background: #1b4332; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .btn-green { background: #1b4332; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .btn-grey { background: #ddd; color: #333; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
     .table-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; margin-bottom: 24px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { background: #1b4332; color: white; padding: 10px 12px; text-align: left; }
@@ -30,18 +30,13 @@
     .empty { text-align: center; color: #777; padding: 30px; font-size: 14px; }
     #loading { text-align: center; padding: 40px; color: #777; font-size: 16px; }
 
-    /* Add School Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
-    .modal.show { display: flex; }
-    .modal-box { background: white; border-radius: 12px; padding: 32px; width: 100%; max-width: 480px; margin: 20px; }
-    .modal-box h2 { font-size: 20px; color: #1b4332; margin-bottom: 20px; }
-    .modal-box label { display: block; margin-top: 12px; font-weight: bold; font-size: 13px; color: #333; }
-    .modal-box input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-    .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
-    .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
-    .btn-save { background: #1b4332; color: white; }
-    .btn-cancel { background: #f0f0f0; color: #333; }
-    #modal-message { margin-top: 12px; padding: 10px; border-radius: 6px; font-size: 13px; display: none; }
+    .add-school-form { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 24px; border-top: 4px solid #1b4332; display: none; }
+    .add-school-form h2 { font-size: 18px; color: #1b4332; margin-bottom: 16px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid label { display: block; font-weight: bold; font-size: 13px; color: #333; margin-bottom: 4px; }
+    .form-grid input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+    .form-buttons { display: flex; gap: 10px; margin-top: 16px; }
+    #form-message { margin-top: 12px; padding: 10px; border-radius: 6px; font-size: 13px; display: none; }
     .success { background: #d8f3dc; color: #1b4332; }
     .error { background: #ffe5e5; color: #9b2226; }
   </style>
@@ -50,9 +45,9 @@
 
   <div class="header">
     <h1>🛡️ SafeTrack — Super Admin</h1>
-    <div class="header-right">
+    <div>
       <span class="badge">Aspita Probs Limited</span>
-      <button onclick="logout()">Logout</button>
+      <button id="logout-btn">Logout</button>
     </div>
   </div>
 
@@ -80,227 +75,40 @@
     </div>
 
     <div class="section">
-      <div class="section-header">
-        <h2>All Schools</h2>
-        <button class="btn-add" type="button" onclick="window.openModal()">+ Add School</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>School Name</th>
-              <th>State</th>
-              <th>LGA</th>
-              <th>Phone</th>
-              <th>Username</th>
-              <th>Students</th>
-            </tr>
-          </thead>
-          <tbody id="schools-body"></tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <h2>Today's Attendance — All Schools</h2>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Student Name</th>
-              <th>School</th>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="attendance-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Add School Modal -->
-  <div class="modal" id="modal">
-    <div class="modal-box">
-      <h2>➕ Add New School</h2>
-
-      <label>School Name</label>
-      <input type="text" id="new-school-name" placeholder="e.g. Greenfield Academy">
-
-      <label>Address</label>
-      <input type="text" id="new-address" placeholder="e.g. 12 Lagos Street, Ikeja">
-
-      <label>Phone Number</label>
-      <input type="text" id="new-phone" placeholder="e.g. 08012345678">
-
-      <label>State</label>
-      <input type="text" id="new-state" placeholder="e.g. Lagos">
-
-      <label>LGA</label>
-      <input type="text" id="new-lga" placeholder="e.g. Ikeja">
-
-      <label>Login Username</label>
-      <input type="text" id="new-username" placeholder="e.g. greenfield2">
-
-      <label>Login Password</label>
-      <input type="text" id="new-password" placeholder="e.g. school123">
-
-      <div id="modal-message"></div>
-
-      <div class="modal-buttons">
-  <button class="btn-cancel" type="button" onclick="window.closeModal()">Cancel</button>
-  <button class="btn-save" type="button" onclick="window.addSchool()">Save School</button>
-</div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
-    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
-    const db = createClient(URL, KEY);
-
-    if (!localStorage.getItem('admin_logged_in')) {
-      window.location.href = 'admin-login.html';
-    }
-
-    async function loadDashboard() {
-      try {
-        const { data: schools } = await db.from('schools').select('*');
-        document.getElementById('total-schools').textContent = schools ? schools.length : 0;
-
-        const schoolsBody = document.getElementById('schools-body');
-        schoolsBody.innerHTML = '';
-
-        if (schools && schools.length > 0) {
-          for (const school of schools) {
-            const { data: students } = await db
-              .from('students')
-              .select('id')
-              .eq('school_id', school.id);
-
-            const studentCount = students ? students.length : 0;
-
-            schoolsBody.innerHTML += `
-              <tr>
-                <td><strong>${school.school_name}</strong></td>
-                <td>${school.state || ''}</td>
-                <td>${school.lga || ''}</td>
-                <td>${school.phone || ''}</td>
-                <td>${school.username}</td>
-                <td>${studentCount}</td>
-              </tr>`;
-          }
-        } else {
-          schoolsBody.innerHTML = '<tr><td colspan="6" class="empty">No schools registered yet</td></tr>';
-        }
-
-        const { data: allStudents } = await db.from('students').select('id');
-        document.getElementById('total-students').textContent = allStudents ? allStudents.length : 0;
-
-        const today = new Date();
-        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-        const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
-
-        const { data: logs } = await db
-          .from('attendance_logs')
-          .select('*, students(full_name, school_id, schools(school_name))')
-          .gte('scanned_at', todayStart)
-          .lt('scanned_at', todayEnd)
-          .order('scanned_at', { ascending: false });
-
-        const arrivals = logs ? logs.filter(l => l.scan_type === 'arrival') : [];
-        const departures = logs ? logs.filter(l => l.scan_type === 'departure') : [];
-
-        document.getElementById('today-arrivals').textContent = arrivals.length;
-        document.getElementById('today-departures').textContent = departures.length;
-
-        const attendanceBody = document.getElementById('attendance-body');
-        attendanceBody.innerHTML = '';
-
-        if (logs && logs.length > 0) {
-          logs.forEach(log => {
-            const scanDate = new Date(log.scanned_at);
-            const time = scanDate.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
-            const date = scanDate.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-            const schoolName = log.students?.schools?.school_name || 'Unknown School';
-            attendanceBody.innerHTML += `
-              <tr>
-                <td>${log.students?.full_name || 'Unknown'}</td>
-                <td>${schoolName}</td>
-                <td><span class="badge-${log.scan_type}">${log.scan_type}</span></td>
-                <td>${date}</td>
-                <td>${time}</td>
-              </tr>`;
-          });
-        } else {
-          attendanceBody.innerHTML = '<tr><td colspan="5" class="empty">No attendance recorded today</td></tr>';
-        }
-
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-
-      } catch (err) {
-        document.getElementById('loading').textContent = 'Error: ' + err.message;
-      }
-    }
-
-    window.openModal = function() {
-      document.getElementById('modal').classList.add('show');
-    }
-
-    window.closeModal = function() {
-      document.getElementById('modal').classList.remove('show');
-      document.getElementById('modal-message').style.display = 'none';
-    }
-
-    window.addSchool = async function() {
-      const school_name = document.getElementById('new-school-name').value.trim();
-      const address = document.getElementById('new-address').value.trim();
-      const phone = document.getElementById('new-phone').value.trim();
-      const state = document.getElementById('new-state').value.trim();
-      const lga = document.getElementById('new-lga').value.trim();
-      const username = document.getElementById('new-username').value.trim();
-      const password = document.getElementById('new-password').value.trim();
-
-      if (!school_name || !username || !password) {
-        showModalMessage('School name, username and password are required.', 'error');
-        return;
-      }
-
-      const { error } = await db.from('schools').insert([{
-        school_name, address, phone, state, lga, username, password
-      }]);
-
-      if (error) {
-        showModalMessage('Error: ' + error.message, 'error');
-      } else {
-        showModalMessage('School added successfully!', 'success');
-        setTimeout(() => {
-          closeModal();
-          loadDashboard();
-        }, 1500);
-      }
-    }
-
-    function showModalMessage(text, type) {
-      const msg = document.getElementById('modal-message');
-      msg.textContent = text;
-      msg.className = type;
-      msg.style.display = 'block';
-    }
-
-    window.logout = function() {
-      localStorage.removeItem('admin_logged_in');
-      window.location.href = 'admin-login.html';
-    }
-
-    loadDashboard();
-  </script>
-</body>
-</html>
+      <!-- Add School Form -->
+      <div class="add-school-form" id="add-school-form">
+        <h2>➕ Add New School</h2>
+        <div class="form-grid">
+          <div>
+            <label>School Name *</label>
+            <input type="text" id="new-school-name" placeholder="e.g. Greenfield Academy">
+          </div>
+          <div>
+            <label>Phone Number</label>
+            <input type="text" id="new-phone" placeholder="e.g. 08012345678">
+          </div>
+          <div>
+            <label>State</label>
+            <input type="text" id="new-state" placeholder="e.g. Lagos">
+          </div>
+          <div>
+            <label>LGA</label>
+            <input type="text" id="new-lga" placeholder="e.g. Ikeja">
+          </div>
+          <div>
+            <label>Login Username *</label>
+            <input type="text" id="new-username" placeholder="e.g. greenfield2">
+          </div>
+          <div>
+            <label>Login Password *</label>
+            <input type="text" id="new-password" placeholder="e.g. school123">
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label>Address</label>
+            <input type="text" id="new-address" placeholder="e.g. 12 Lagos Street, Ikeja">
+          </div>
+        </div>
+        <div id="form-message"></div>
+        <div class="form-buttons">
+          <button class="btn-grey" id="cancel-btn">Cancel</bu
