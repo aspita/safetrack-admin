@@ -82,7 +82,7 @@
     <div class="section">
       <div class="section-header">
         <h2>All Schools</h2>
-        <button class="btn-add" onclick="openModal()">+ Add School</button>
+        <button class="btn-add" type="button" onclick="window.openModal()">+ Add School</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -152,9 +152,9 @@
       <div id="modal-message"></div>
 
       <div class="modal-buttons">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-save" onclick="addSchool()">Save School</button>
-      </div>
+  <button class="btn-cancel" type="button" onclick="window.closeModal()">Cancel</button>
+  <button class="btn-save" type="button" onclick="window.addSchool()">Save School</button>
+</div>
     </div>
   </div>
 
