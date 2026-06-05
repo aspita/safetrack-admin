@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Generate PIN</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f0f7f4; min-height: 100vh; }
+    .header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 18px; }
+    .header button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .content { padding: 20px 16px; max-width: 500px; margin: 0 auto; }
+    .info-box { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .info-box h2 { font-size: 16px; color: #2d6a4f; margin-bottom: 8px; }
+    .info-box p { font-size: 13px; color: #666; line-height: 1.6; }
+    label { display: block; margin-top: 16px; font-weight: bold; font-size: 14px; color: #333; }
+    input { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+    .generate-btn { margin-top: 24px; width: 100%; padding: 16px; background: #2d6a4f; color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; }
+    .generate-btn:hover { background: #1b4332; }
+    .back-btn { margin-top: 12px; width: 100%; padding: 12px; background: transparent; color: #2d6a4f; border: 2px solid #2d6a4f; border-radius: 12px; font-size: 15px; cursor: pointer; }
+    #result { margin-top: 24px; background: white; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: none; }
+    #result h3 { font-size: 16px; color: #555; margin-bottom: 8px; }
+    #pin-display { font-size: 52px; font-weight: bold; letter-spacing: 10px; color: #2d6a4f; margin: 12px 0; }
+    #timer { font-size: 15px; color: #777; margin-top: 8px; }
+    #expires { font-size: 13px; color: #aaa; }
+    .share-text { margin-top: 16px; background: #f0f7f4; border-radius: 10px; padding: 12px; font-size: 13px; color: #555; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🔐 Pickup PIN</h1>
+    <button id="back-btn">← Back</button>
+  </div>
+
+  <div class="content">
+    <div class="info-box">
+      <h2>How it works</h2>
+      <p>Enter the name of the person picking up your child. A secure 6-digit PIN will be generated. Share this PIN with them — they must show it at the school gate. The PIN expires in 30 minutes.</p>
+    </div>
+
+    <label>Pickup Person's Full Name</label>
+    <input type="text" id="pickup_name" placeholder="e.g. Uncle Emeka Okafor">
+
+    <button class="generate-btn" id="generate-btn">Generate PIN</button>
+
+    <div id="result">
+      <h3>Your pickup PIN is:</h3>
+      <div id="pin-display"></div>
+      <div id="expires"></div>
+      <div id="timer"></div>
+      <div class="share-text" id="share-text"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(URL, KEY);
+
+    const studentId = localStorage.getItem('parent_student_id');
+    const studentName = localStorage.getItem('parent_student_name');
+    const schoolName = localStorage.getItem('parent_school_name');
+
+    if (!studentId) {
+      window.location.href = 'parent-login.html';
+    }
+
+    document.getElementById('back-btn').addEventListener('click', function() {
+      window.location.href = 'parent-home.html';
+    });
+
+    let countdown;
+
+    document.getElementById('generate-btn').addEventListener('click', async function() {
+      const pickup_name = document.getElementById('pickup_name').value.trim();
+
+      if (!pickup_name) {
+        alert('Please enter the pickup person name.');
+        return;
+      }
+
+      const pin = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+
+      const { error } = await db.from('pickup_pins').insert([{
+        student_id: parseInt(studentId),
+        pin_code: pin,
+        pickup_name: pickup_name,
+        expires_at: expiresAt.toISOString(),
+        used: false
+      }]);
+
+      if (error) {
+        alert('Error generating PIN: ' + error.message);
+        return;
+      }
+
+      document.getElementById('pin-display').textContent = pin;
+      document.getElementById('expires').textContent = 'Expires at: ' + expiresAt.toLocaleTimeString();
+      document.getElementById('share-text').innerHTML = `
+        Tell <strong>${pickup_name}</strong> to show this PIN at the gate of <strong>${schoolName}</strong> 
+        when picking up <strong>${studentName}</strong>. 
+        The school will ask for their name — make sure they know the PIN AND their name must match.`;
+      document.getElementById('result').style.display = 'block';
+
+      if (countdown) clearInterval(countdown);
+      let secondsLeft = 30 * 60;
+      const timerEl = document.getElementById('timer');
+
+      countdown = setInterval(() => {
+        secondsLeft--;
+        const mins = Math.floor(secondsLeft / 60);
+        const secs = secondsLeft % 60;
+        timerEl.textContent = `⏱ Time remaining: ${mins}:${secs.toString().padStart(2, '0')}`;
+        if (secondsLeft <= 0) {
+          clearInterval(countdown);
+          timerEl.textContent = '❌ PIN has expired!';
+          document.getElementById('pin-display').style.color = '#9b2226';
+        }
+      }, 1000);
+
+      document.getElementById('pickup_name').value = '';
+    });
+  </script>
+</body>
+</html>
