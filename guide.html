@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — School Guide</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #fff; color: #333; }
+
+    nav { background: #2d6a4f; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
+    nav .logo { color: white; font-size: 22px; font-weight: bold; }
+    nav a { color: white; text-decoration: none; font-size: 14px; margin-left: 24px; opacity: 0.9; }
+
+    .hero { background: linear-gradient(135deg, #2d6a4f, #1b4332); color: white; text-align: center; padding: 60px 20px; }
+    .hero h1 { font-size: 32px; margin-bottom: 12px; }
+    .hero p { font-size: 16px; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+    .section { padding: 50px 20px; max-width: 800px; margin: 0 auto; }
+    .section h2 { font-size: 24px; color: #2d6a4f; margin-bottom: 24px; padding-bottom: 10px; border-bottom: 2px solid #d8f3dc; }
+
+    .step { display: flex; gap: 20px; margin-bottom: 28px; align-items: flex-start; }
+    .step-num { width: 44px; height: 44px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
+    .step-content h3 { font-size: 16px; color: #333; margin-bottom: 6px; }
+    .step-content p { font-size: 14px; color: #666; line-height: 1.6; }
+
+    .money-box { background: #d8f3dc; border-radius: 16px; padding: 28px; margin: 20px 0; border-left: 6px solid #2d6a4f; }
+    .money-box h3 { font-size: 20px; color: #1b4332; margin-bottom: 16px; }
+    .money-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 15px; }
+    .money-row:last-child { border-bottom: none; font-weight: bold; font-size: 17px; color: #1b4332; }
+    .money-row span:last-child { color: #2d6a4f; font-weight: bold; }
+
+    .warning-box { background: #fff8e1; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 6px solid #f4a261; }
+    .warning-box h3 { font-size: 16px; color: #e65100; margin-bottom: 8px; }
+    .warning-box p { font-size: 14px; color: #666; line-height: 1.6; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .info-card { background: #f9f9f9; border-radius: 12px; padding: 20px; }
+    .info-card .icon { font-size: 28px; margin-bottom: 10px; }
+    .info-card h3 { font-size: 15px; color: #2d6a4f; margin-bottom: 6px; }
+    .info-card p { font-size: 13px; color: #666; line-height: 1.5; }
+
+    .link-box { background: #f0f7f4; border-radius: 12px; padding: 20px; margin: 16px 0; }
+    .link-box h3 { font-size: 15px; color: #333; margin-bottom: 12px; }
+    .link-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #ddd; font-size: 14px; }
+    .link-item:last-child { border-bottom: none; }
+    .link-item span:first-child { color: #555; }
+    .link-item a { color: #2d6a4f; font-weight: bold; text-decoration: none; }
+
+    .pricing-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .pricing-table th { background: #2d6a4f; color: white; padding: 12px 16px; text-align: left; }
+    .pricing-table td { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 14px; }
+    .pricing-table tr:last-child td { border-bottom: none; font-weight: bold; background: #f0f7f4; }
+
+    .contact-box { background: #2d6a4f; color: white; border-radius: 16px; padding: 28px; text-align: center; margin: 20px 0; }
+    .contact-box h3 { font-size: 20px; margin-bottom: 12px; }
+    .contact-box p { font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
+    .contact-box a { background: white; color: #2d6a4f; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block; margin: 6px; }
+
+    footer { background: #1b4332; color: white; text-align: center; padding: 20px; font-size: 13px; }
+
+    @media print {
+      nav, footer { display: none; }
+      .hero { padding: 30px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">🛡️ SafeTrack</div>
+    <div>
+      <a href="safetrack.html">Home</a>
+      <a href="school-login.html">School Login</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>📋 SafeTrack School Guide</h1>
+    <p>Everything your school needs to know about SafeTrack — how it works, how staff use it, how parents use it, and how your school earns from it.</p>
+  </div>
+
+  <!-- WHAT IS SAFETRACK -->
+  <div class="section">
+    <h2>🛡️ What is SafeTrack?</h2>
+    <p style="font-size:15px; color:#555; line-height:1.8; margin-bottom:20px;">
+      SafeTrack is a school safety system that automatically notifies parents the moment their child arrives or leaves school. Every student gets a unique QR code on their ID card. When staff scan the card at the gate, parents instantly receive a WhatsApp message with the exact time.
+    </p>
+    <p style="font-size:15px; color:#555; line-height:1.8;">
+      SafeTrack also includes a secure PIN system for child pickup — ensuring no child is released to an unauthorized person.
+    </p>
+  </div>
+
+  <!-- HOW STAFF USE IT -->
+  <div class="section" style="background:#f9f9f9; max-width:100%; padding: 50px 20px;">
+    <div style="max-width:800px; margin:0 auto;">
+      <h2>👨‍💼 How School Staff Use SafeTrack</h2>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Open the Gate Scanner</h3>
+          <p>Every morning, the gate staff opens SafeTrack on their phone or tablet by going to the school's SafeTrack link. No app download needed — it works directly in the browser.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Select Arrival or Departure</h3>
+          <p>In the morning, tap the green "Arrival" button. In the afternoon when students are leaving, tap the red "Departure" button.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Scan the Student's ID Card</h3>
+          <p>Point the phone camera at the QR code on the student's ID card. The system beeps and shows the student's name and time. The parent is automatically notified via WhatsApp.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Verify Pickup PIN</h3>
+          <p>When someone comes to pick up a child, switch to the "Verify PIN" tab. Ask them for their 6-digit PIN. Enter it into the system — it will show the child's name and the authorized pickup person's name. Ask the person to confirm their name before releasing the child.</p>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <h3>⚠️ Important Security Rule</h3>
+        <p>Always ask the pickup person to say their name BEFORE showing them the screen. The name on screen must match what they say. If it does not match — do NOT release the child and contact the parent immediately.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW PARENTS USE IT -->
+  <div class="section">
+    <h2>👨‍👩‍👧 How Parents Use SafeTrack</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">📱</div>
+        <h3>Install the App</h3>
+        <p>Parents open the SafeTrack parent portal in their phone browser and add it to their home screen like a real app. Works on Android and iPhone.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🔑</div>
+        <h3>Login with QR Code</h3>
+        <p>Parents login using their phone number and their child's QR code — found in the ID card booklet given at registration.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">📊</div>
+        <h3>View Attendance</h3>
+        <p>Parents can see their child's full attendance history — every arrival and departure with exact date and time.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🔐</div>
+        <h3>Generate Pickup PIN</h3>
+        <p>When sending someone to pick up their child, parents generate a secure 6-digit PIN valid for 30 minutes and share it with the pickup person.</p>
+      </div>
+    </div>
+
+    <div class="link-box">
+      <h3>Parent App Links</h3>
+      <div class="link-item">
+        <span>Parent Login</span>
+        <a href="parent-login.html">Open Parent App</a>
+      </div>
+      <div class="link-item">
+        <span>Generate Pickup PIN</span>
+        <a href="parent-pin.html">Open PIN Generator</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW ADMIN USES IT -->
+  <div class="section" style="background:#f9f9f9; max-width:100%; padding: 50px 20px;">
+    <div style="max-width:800px; margin:0 auto;">
+      <h2>🖥️ How School Admin Uses SafeTrack</h2>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Login to School Dashboard</h3>
+          <p>The school admin logs in with their unique username and password provided by SafeTrack during onboarding.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Register Students</h3>
+          <p>Add each student to the system with their full name, class, parent phone number and WhatsApp number. The system automatically generates a unique QR code for each student.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>View Attendance Reports</h3>
+          <p>The dashboard shows today's arrivals and departures in real time. Use the date filter to view attendance for any previous date.</p>
+        </div>
+      </div>
+
+      <div class="link-box">
+        <h3>Admin Links</h3>
+        <div class="link-item">
+          <span>School Dashboard</span>
+          <a href="school-login.html">School Login</a>
+        </div>
+        <div class="link-item">
+          <span>Gate Scanner + PIN Verify</span>
+          <a href="gate.html">Open Gate App</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="section">
+    <h2>💰 SafeTrack Pricing</h2>
+    <p style="font-size:15px; color:#555; line-height:1.8; margin-bottom:20px;">
+      SafeTrack works on a simple per-student model. There is no large upfront cost — you only pay per student enrolled. This means the cost is passed directly to parents as part of their school fees.
+    </p>
+
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Cost</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Student ID Card + QR Code</td>
+          <td>₦800 per student</td>
+          <td>One time. Includes setup and printing.</td>
+        </tr>
+        <tr>
+          <td>Monthly Subscription</td>
+          <td>₦300 per student/month</td>
+          <td>Includes WhatsApp notifications</td>
+        </tr>
+        <tr>
+          <td>Example — 500 students</td>
+          <td>₦400,000 + ₦150,000/month</td>
+          <td>Charged to parents via school fees</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="money-box">
+      <h3>💵 How Your School Earns from SafeTrack</h3>
+      <p style="font-size:14px; color:#555; margin-bottom:16px;">
+        Your school collects SafeTrack fees from parents as part of school fees. Here is an example with 500 students at ₦500/month per parent:
+      </p>
+      <div class="money-row">
+        <span>Parents pay school (500 × ₦500)</span>
+        <span>₦250,000/month</span>
+      </div>
+      <div class="money-row">
+        <span>School pays SafeTrack (500 × ₦300)</span>
+        <span>₦150,000/month</span>
+      </div>
+      <div class="money-row">
+        <span>🏆 Your school keeps every month</span>
+        <span>₦100,000/month</span>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <h3>📌 Note</h3>
+      <p>The school decides what to charge parents. The more students enrolled, the more your school earns. SafeTrack handles all the technology — your school just collects the fees.</p>
+    </div>
+  </div>
+
+  <!-- THREE LAYER SECURITY -->
+  <div class="section" style="background:#f9f9f9; max-width:100%; padding: 50px 20px;">
+    <div style="max-width:800px; margin:0 auto;">
+      <h2>🔒 Three Layer Security System</h2>
+      <p style="font-size:15px; color:#555; line-height:1.8; margin-bottom:24px;">
+        SafeTrack is the only school safety system in Nigeria with three independent security layers protecting every child.
+      </p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>QR Code — Unique to every student</h3>
+          <p>Each student has a unique QR code that cannot be duplicated. Lost cards can be reported and deactivated immediately.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Time-Limited PIN — Expires in 30 minutes</h3>
+          <p>Parents generate a new PIN every time someone needs to pick up their child. The PIN expires after 30 minutes and can only be used once.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Name Verification — Human security check</h3>
+          <p>Staff ask the pickup person to state their name before checking the system. If the name does not match — the child is not released.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="section">
+    <h2>📞 Get SafeTrack for Your School</h2>
+    <div class="contact-box">
+      <h3>Ready to protect your students?</h3>
+      <p>Contact us today and we will onboard your school within 48 hours. All we need is your student list and we handle everything else.</p>
+      <a href="mailto:info@aspitaprobs.com">📧 Email Us</a>
+      <a href="https://wa.me/2348012345678">💬 WhatsApp Us</a>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 SafeTrack by Aspita Probs Limited — Keeping Nigerian School Children Safe 🇳🇬
+  </footer>
+
+</body>
+</html>
