@@ -134,8 +134,14 @@
       </div>
 
       <div class="section-header">
-        <h2>Today's Attendance — All Schools</h2>
-      </div>
+  <h2>Attendance — All Schools</h2>
+</div>
+<div style="margin-bottom:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+  <label style="font-weight:bold; font-size:14px;">Filter by date:</label>
+  <input type="date" id="date-filter" style="padding:8px; border:1px solid #ccc; border-radius:6px; font-size:14px;">
+  <button id="filter-btn" class="btn-green">Search</button>
+  <button id="clear-btn" class="btn-grey">Today</button>
+</div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -304,7 +310,49 @@
         document.getElementById('loading').textContent = 'Error loading dashboard: ' + err.message;
       }
     }
+document.getElementById('filter-btn').addEventListener('click', async function() {
+  const dateValue = document.getElementById('date-filter').value;
+  if (!dateValue) return;
 
+  const startDate = new Date(dateValue).toISOString();
+  const endDate = new Date(new Date(dateValue).getTime() + 86400000).toISOString();
+
+  const { data: logs } = await db
+    .from('attendance_logs')
+    .select('*, students(full_name, school_id)')
+    .gte('scanned_at', startDate)
+    .lt('scanned_at', endDate)
+    .order('scanned_at', { ascending: false });
+
+  const attendanceBody = document.getElementById('attendance-body');
+  attendanceBody.innerHTML = '';
+
+  if (logs && logs.length > 0) {
+    logs.forEach(log => {
+      const scanDate = new Date(log.scanned_at);
+      const time = scanDate.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const date = scanDate.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      const school = allSchools.find(s => s.id === log.students?.school_id);
+      const schoolName = school ? school.school_name : 'Unknown';
+      attendanceBody.innerHTML += `
+        <tr>
+          <td>${log.students?.full_name || 'Unknown'}</td>
+          <td>${schoolName}</td>
+          <td><span class="badge-${log.scan_type}">${log.scan_type}</span></td>
+          <td>${date}</td>
+          <td>${time}</td>
+        </tr>`;
+    });
+  } else {
+    attendanceBody.innerHTML = '<tr><td colspan="5" class="empty">No attendance recorded for this date</td></tr>';
+  }
+});
+
+document.getElementById('clear-btn').addEventListener('click', function() {
+  document.getElementById('date-filter').value = '';
+  loadDashboard();
+});
+    
     loadDashboard();
   </script>
 </body>
