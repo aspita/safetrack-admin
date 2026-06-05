@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Parent Home</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f0f7f4; min-height: 100vh; }
+    .header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 18px; }
+    .header button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .child-card { background: white; margin: 16px; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
+    .child-avatar { width: 56px; height: 56px; background: #2d6a4f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; flex-shrink: 0; }
+    .child-info h2 { font-size: 18px; color: #333; }
+    .child-info p { font-size: 13px; color: #777; margin-top: 2px; }
+    .status-card { margin: 0 16px 16px; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+    .status-in { background: #d8f3dc; }
+    .status-out { background: #ffe5e5; }
+    .status-unknown { background: #f0f0f0; }
+    .status-icon { font-size: 32px; }
+    .status-text h3 { font-size: 16px; color: #333; }
+    .status-text p { font-size: 13px; color: #555; margin-top: 2px; }
+    .pin-btn { margin: 0 16px 16px; background: #2d6a4f; color: white; border: none; border-radius: 16px; padding: 18px; width: calc(100% - 32px); font-size: 17px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .pin-btn:hover { background: #1b4332; }
+    .section-title { padding: 0 16px 10px; font-size: 16px; font-weight: bold; color: #333; }
+    .log-item { background: white; margin: 0 16px 8px; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+    .log-left { display: flex; align-items: center; gap: 12px; }
+    .log-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .log-icon.arrival { background: #d8f3dc; }
+    .log-icon.departure { background: #ffe5e5; }
+    .log-type { font-size: 14px; font-weight: bold; color: #333; text-transform: capitalize; }
+    .log-date { font-size: 12px; color: #777; margin-top: 2px; }
+    .log-time { font-size: 14px; font-weight: bold; color: #2d6a4f; }
+    .empty { text-align: center; padding: 40px 20px; color: #777; font-size: 14px; }
+    #loading { text-align: center; padding: 40px; color: #777; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🛡️ SafeTrack</h1>
+    <button id="logout-btn">Logout</button>
+  </div>
+
+  <div id="loading">Loading...</div>
+
+  <div id="content" style="display:none">
+
+    <div class="child-card">
+      <div class="child-avatar">👦</div>
+      <div class="child-info">
+        <h2 id="child-name">Loading...</h2>
+        <p id="child-school">School name</p>
+        <p id="child-qr" style="font-size:11px; color:#aaa; margin-top:2px;"></p>
+      </div>
+    </div>
+
+    <div class="status-card" id="status-card">
+      <div class="status-icon" id="status-icon">⏳</div>
+      <div class="status-text">
+        <h3 id="status-title">Checking status...</h3>
+        <p id="status-desc"></p>
+      </div>
+    </div>
+
+    <button class="pin-btn" id="pin-btn">
+      🔐 Generate Pickup PIN
+    </button>
+
+    <div class="section-title">Recent Attendance</div>
+
+    <div id="logs-container"></div>
+
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(URL, KEY);
+
+    const studentId = localStorage.getItem('parent_student_id');
+    const studentName = localStorage.getItem('parent_student_name');
+    const studentQr = localStorage.getItem('parent_student_qr');
+    const schoolName = localStorage.getItem('parent_school_name');
+
+    if (!studentId) {
+      window.location.href = 'parent-login.html';
+    }
+
+    document.getElementById('child-name').textContent = studentName;
+    document.getElementById('child-school').textContent = schoolName;
+    document.getElementById('child-qr').textContent = studentQr;
+
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      localStorage.removeItem('parent_student_id');
+      localStorage.removeItem('parent_student_name');
+      localStorage.removeItem('parent_student_qr');
+      localStorage.removeItem('parent_school_name');
+      localStorage.removeItem('parent_phone');
+      window.location.href = 'parent-login.html';
+    });
+
+    document.getElementById('pin-btn').addEventListener('click', function() {
+      window.location.href = 'parent-pin.html';
+    });
+
+    async function loadData() {
+      try {
+        const { data: logs } = await db
+          .from('attendance_logs')
+          .select('*')
+          .eq('student_id', parseInt(studentId))
+          .order('scanned_at', { ascending: false })
+          .limit(10);
+
+        if (logs && logs.length > 0) {
+          const latest = logs[0];
+          const latestTime = new Date(latest.scanned_at).toLocaleTimeString('en-NG', {
+            hour: '2-digit', minute: '2-digit', hour12: true
+          });
+
+          const statusCard = document.getElementById('status-card');
+          const statusIcon = document.getElementById('status-icon');
+          const statusTitle = document.getElementById('status-title');
+          const statusDesc = document.getElementById('status-desc');
+
+          if (latest.scan_type === 'arrival') {
+            statusCard.className = 'status-card status-in';
+            statusIcon.textContent = '✅';
+            statusTitle.textContent = `${studentName} is at school`;
+            statusDesc.textContent = `Arrived at ${latestTime}`;
+          } else {
+            statusCard.className = 'status-card status-out';
+            statusIcon.textContent = '🏠';
+            statusTitle.textContent = `${studentName} has left school`;
+            statusDesc.textContent = `Departed at ${latestTime}`;
+          }
+
+          const logsContainer = document.getElementById('logs-container');
+          logsContainer.innerHTML = '';
+
+          logs.forEach(log => {
+            const scanDate = new Date(log.scanned_at);
+            const time = scanDate.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const date = scanDate.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short' });
+            const icon = log.scan_type === 'arrival' ? '🟢' : '🔴';
+            logsContainer.innerHTML += `
+              <div class="log-item">
+                <div class="log-left">
+                  <div class="log-icon ${log.scan_type}">${icon}</div>
+                  <div>
+                    <div class="log-type">${log.scan_type}</div>
+                    <div class="log-date">${date}</div>
+                  </div>
+                </div>
+                <div class="log-time">${time}</div>
+              </div>`;
+          });
+
+        } else {
+          document.getElementById('status-card').className = 'status-card status-unknown';
+          document.getElementById('status-icon').textContent = '❓';
+          document.getElementById('status-title').textContent = 'No scans recorded yet';
+          document.getElementById('status-desc').textContent = 'Your child has not been scanned today';
+          document.getElementById('logs-container').innerHTML = '<div class="empty">No attendance records found</div>';
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('loading').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
