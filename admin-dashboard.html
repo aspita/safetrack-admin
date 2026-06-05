@@ -29,7 +29,6 @@
     .badge-departure { background: #ffe5e5; color: #9b2226; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
     .empty { text-align: center; color: #777; padding: 30px; font-size: 14px; }
     #loading { text-align: center; padding: 40px; color: #777; font-size: 16px; }
-
     .add-school-form { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 24px; border-top: 4px solid #1b4332; display: none; }
     .add-school-form h2 { font-size: 18px; color: #1b4332; margin-bottom: 16px; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -54,7 +53,6 @@
   <div id="loading">Loading admin dashboard...</div>
 
   <div id="content" style="display:none">
-
     <div class="stats">
       <div class="stat">
         <div class="number" id="total-schools">0</div>
@@ -76,7 +74,6 @@
 
     <div class="section">
 
-      <!-- Add School Form -->
       <div class="add-school-form" id="add-school-form">
         <h2>➕ Add New School</h2>
         <div class="form-grid">
@@ -111,4 +108,204 @@
         </div>
         <div id="form-message"></div>
         <div class="form-buttons">
-          <button class="btn-grey" id="cancel-btn">Cancel</bu
+          <button class="btn-grey" id="cancel-btn">Cancel</button>
+          <button class="btn-green" id="save-btn">Save School</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2>All Schools</h2>
+        <button class="btn-green" id="add-school-btn">+ Add School</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>School Name</th>
+              <th>State</th>
+              <th>LGA</th>
+              <th>Phone</th>
+              <th>Username</th>
+              <th>Students</th>
+            </tr>
+          </thead>
+          <tbody id="schools-body"></tbody>
+        </table>
+      </div>
+
+      <div class="section-header">
+        <h2>Today's Attendance — All Schools</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>School</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-body"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    if (!localStorage.getItem('admin_logged_in')) {
+      window.location.href = 'admin-login.html';
+    }
+
+    let allSchools = [];
+
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      localStorage.removeItem('admin_logged_in');
+      window.location.href = 'admin-login.html';
+    });
+
+    document.getElementById('add-school-btn').addEventListener('click', function() {
+      document.getElementById('add-school-form').style.display = 'block';
+      window.scrollTo(0, 0);
+    });
+
+    document.getElementById('cancel-btn').addEventListener('click', function() {
+      document.getElementById('add-school-form').style.display = 'none';
+      document.getElementById('form-message').style.display = 'none';
+    });
+
+    document.getElementById('save-btn').addEventListener('click', async function() {
+      const school_name = document.getElementById('new-school-name').value.trim();
+      const phone = document.getElementById('new-phone').value.trim();
+      const state = document.getElementById('new-state').value.trim();
+      const lga = document.getElementById('new-lga').value.trim();
+      const username = document.getElementById('new-username').value.trim();
+      const password = document.getElementById('new-password').value.trim();
+      const address = document.getElementById('new-address').value.trim();
+
+      if (!school_name || !username || !password) {
+        showFormMessage('School name, username and password are required!', 'error');
+        return;
+      }
+
+      const { error } = await db.from('schools').insert([{
+        school_name, phone, state, lga, username, password, address
+      }]);
+
+      if (error) {
+        showFormMessage('Error: ' + error.message, 'error');
+      } else {
+        showFormMessage('School added successfully!', 'success');
+        setTimeout(() => {
+          document.getElementById('add-school-form').style.display = 'none';
+          document.getElementById('form-message').style.display = 'none';
+          document.querySelectorAll('#add-school-form input').forEach(i => i.value = '');
+          loadDashboard();
+        }, 1500);
+      }
+    });
+
+    function showFormMessage(text, type) {
+      const msg = document.getElementById('form-message');
+      msg.textContent = text;
+      msg.className = type;
+      msg.style.display = 'block';
+    }
+
+    async function loadDashboard() {
+      try {
+        const { data: schools, error: schoolsError } = await db
+          .from('schools').select('*');
+
+        if (schoolsError) throw schoolsError;
+
+        allSchools = schools || [];
+        document.getElementById('total-schools').textContent = allSchools.length;
+
+        const schoolsBody = document.getElementById('schools-body');
+        schoolsBody.innerHTML = '';
+
+        if (allSchools.length > 0) {
+          for (const school of allSchools) {
+            const { data: students } = await db
+              .from('students').select('id').eq('school_id', school.id);
+            const count = students ? students.length : 0;
+            schoolsBody.innerHTML += `
+              <tr>
+                <td><strong>${school.school_name}</strong></td>
+                <td>${school.state || ''}</td>
+                <td>${school.lga || ''}</td>
+                <td>${school.phone || ''}</td>
+                <td>${school.username}</td>
+                <td>${count}</td>
+              </tr>`;
+          }
+        } else {
+          schoolsBody.innerHTML = '<tr><td colspan="6" class="empty">No schools registered yet</td></tr>';
+        }
+
+        const { data: allStudents } = await db.from('students').select('id');
+        document.getElementById('total-students').textContent = allStudents ? allStudents.length : 0;
+
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+        const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+
+        const { data: logs, error: logsError } = await db
+          .from('attendance_logs')
+          .select('*, students(full_name, school_id)')
+          .gte('scanned_at', todayStart)
+          .lt('scanned_at', todayEnd)
+          .order('scanned_at', { ascending: false });
+
+        if (logsError) throw logsError;
+
+        const arrivals = logs ? logs.filter(l => l.scan_type === 'arrival') : [];
+        const departures = logs ? logs.filter(l => l.scan_type === 'departure') : [];
+
+        document.getElementById('today-arrivals').textContent = arrivals.length;
+        document.getElementById('today-departures').textContent = departures.length;
+
+        const attendanceBody = document.getElementById('attendance-body');
+        attendanceBody.innerHTML = '';
+
+        if (logs && logs.length > 0) {
+          logs.forEach(log => {
+            const scanDate = new Date(log.scanned_at);
+            const time = scanDate.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const date = scanDate.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            const school = allSchools.find(s => s.id === log.students?.school_id);
+            const schoolName = school ? school.school_name : 'Unknown';
+            attendanceBody.innerHTML += `
+              <tr>
+                <td>${log.students?.full_name || 'Unknown'}</td>
+                <td>${schoolName}</td>
+                <td><span class="badge-${log.scan_type}">${log.scan_type}</span></td>
+                <td>${date}</td>
+                <td>${time}</td>
+              </tr>`;
+          });
+        } else {
+          attendanceBody.innerHTML = '<tr><td colspan="5" class="empty">No attendance recorded today</td></tr>';
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('loading').textContent = 'Error loading dashboard: ' + err.message;
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
