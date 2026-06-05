@@ -11,15 +11,11 @@
     .header { background: #2d6a4f; color: white; padding: 16px 20px; text-align: center; }
     .header h1 { font-size: 20px; }
     .header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
-
     .tabs { display: flex; background: #1b4332; }
     .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-size: 15px; opacity: 0.6; border: none; background: none; }
     .tab.active { opacity: 1; border-bottom: 3px solid white; font-weight: bold; }
-
     .page { display: none; padding: 20px; max-width: 500px; margin: 0 auto; }
     .page.active { display: block; }
-
-    /* Scanner styles */
     .mode-buttons { display: flex; gap: 10px; margin-bottom: 16px; }
     .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; color: white; font-weight: bold; }
     .mode-btn.arrival { background: #2d6a4f; }
@@ -28,8 +24,6 @@
     #mode-label { text-align: center; font-size: 14px; color: #555; margin-bottom: 12px; font-weight: bold; }
     #reader { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
     #scan-result { padding: 16px; border-radius: 10px; font-size: 15px; text-align: center; display: none; font-weight: bold; }
-
-    /* PIN verify styles */
     .pin-box { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
     .pin-box h2 { font-size: 18px; color: #2d6a4f; margin-bottom: 8px; }
     .pin-box p { font-size: 13px; color: #777; margin-bottom: 20px; }
@@ -53,8 +47,8 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('scanner')">📷 QR Scanner</button>
-    <button class="tab" onclick="switchTab('pin')">🔐 Verify PIN</button>
+    <button class="tab active" id="tab-scanner" onclick="switchTab('scanner')">📷 QR Scanner</button>
+    <button class="tab" id="tab-pin" onclick="switchTab('pin')">🔐 Verify PIN</button>
   </div>
 
   <!-- SCANNER PAGE -->
@@ -75,7 +69,7 @@
     <div class="pin-box">
       <h2>Verify Pickup PIN</h2>
       <p>Enter the 6-digit PIN given by the parent</p>
-      <input type="number" class="pin-input" id="pin-input" placeholder="000000" maxlength="6">
+      <input type="number" class="pin-input" id="pin-input" placeholder="000000">
       <button class="verify-btn" id="verify-btn">Verify PIN</button>
       <div id="pin-result"></div>
     </div>
@@ -84,9 +78,9 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
-    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
-    const db = createClient(URL, KEY);
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentMode = 'arrival';
     let scanning = true;
@@ -97,9 +91,8 @@
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      event.target.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
       document.getElementById('page-' + tab).classList.add('active');
-
       if (tab === 'scanner' && !scannerStarted) {
         startScanner();
       }
@@ -113,20 +106,24 @@
       document.getElementById('btn-departure').classList.toggle('active', mode === 'departure');
     }
 
-    // Show scan result
+    // Beep sound
     function beep() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = ctx.createOscillator();
-  const gain = ctx.createGain();
-  oscillator.connect(gain);
-  gain.connect(ctx.destination);
-  oscillator.type = 'sine';
-  oscillator.frequency.value = 1200;
-  gain.gain.setValueAtTime(1, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-  oscillator.start(ctx.currentTime);
-  oscillator.stop(ctx.currentTime + 0.3);
-}
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 1200;
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.3);
+      } catch(e) {}
+    }
+
+    // Show scan result
     function showScanResult(text, type) {
       const el = document.getElementById('scan-result');
       el.textContent = text;
@@ -150,21 +147,56 @@
         .single();
 
       if (error || !data) {
+        beep();
         showScanResult('Student not found! Check the ID card.', 'error');
         return;
       }
 
+      // Get last attendance record for this student
+      const { data: lastLog } = await db
+        .from('attendance_logs')
+        .select('*')
+        .eq('student_id', data.id)
+        .order('scanned_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      const lastScan = lastLog ? lastLog.scan_type : null;
+
+      // Block double arrival
+      if (currentMode === 'arrival' && lastScan === 'arrival') {
+        beep();
+        showScanResult(
+          '⚠️ ' + data.full_name + ' already arrived! They must depart first.',
+          'error'
+        );
+        return;
+      }
+
+      // Block departure without arrival
+      if (currentMode === 'departure' && (lastScan === null || lastScan === 'departure')) {
+        beep();
+        showScanResult(
+          '⚠️ ' + data.full_name + ' has not arrived yet! Arrival must come first.',
+          'error'
+        );
+        return;
+      }
+
+      // Log the attendance
       const { error: logError } = await db.from('attendance_logs').insert([{
         student_id: data.id,
         scan_type: currentMode,
         scanned_at: new Date().toISOString()
       }]);
 
-      beep();
-if (logError) {
+      if (logError) {
         showScanResult('Error logging: ' + logError.message, 'error');
       } else {
-        const time = new Date().toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
+        beep();
+        const time = new Date().toLocaleTimeString('en-NG', {
+          hour: '2-digit', minute: '2-digit', hour12: true
+        });
         showScanResult(
           currentMode === 'arrival'
             ? '✅ ' + data.full_name + ' arrived at ' + time
@@ -239,6 +271,7 @@ if (logError) {
       document.getElementById('pin-input').value = '';
     });
 
+    // Start scanner on load
     startScanner();
   </script>
 </body>
