@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Bulk Student Upload</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    .header { background: #1b4332; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 20px; }
+    .header a { color: white; font-size: 13px; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 14px; border-radius: 6px; }
+    .content { max-width: 700px; margin: 30px auto; padding: 0 20px; }
+
+    .step-box { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .step-box h2 { font-size: 16px; color: #1b4332; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .step-num { width: 28px; height: 28px; background: #1b4332; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
+    .step-box p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+
+    .download-btn { display: inline-block; background: #2d6a4f; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; cursor: pointer; border: none; }
+    .download-btn:hover { background: #1b4332; }
+
+    .upload-area { border: 2px dashed #2d6a4f; border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; background: #f0f7f4; margin: 12px 0; }
+    .upload-area:hover { background: #d8f3dc; }
+    .upload-area .icon { font-size: 36px; margin-bottom: 8px; }
+    .upload-area p { font-size: 14px; color: #555; }
+    .upload-area input { display: none; }
+
+    .school-select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; margin-bottom: 12px; }
+
+    .preview-box { background: #f9f9f9; border-radius: 10px; overflow: hidden; margin: 12px 0; display: none; }
+    .preview-header { background: #1b4332; color: white; padding: 10px 16px; font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; }
+    .preview-table { overflow-x: auto; max-height: 300px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #2d6a4f; color: white; padding: 8px 12px; text-align: left; position: sticky; top: 0; }
+    td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+    tr:last-child td { border-bottom: none; }
+
+    .upload-btn { width: 100%; padding: 14px; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 12px; display: none; }
+    .upload-btn:hover { background: #1b4332; }
+    .upload-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    #progress-box { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: none; }
+    #progress-box h2 { font-size: 16px; color: #1b4332; margin-bottom: 16px; }
+    .progress-bar-wrap { background: #f0f0f0; border-radius: 10px; height: 16px; overflow: hidden; margin-bottom: 10px; }
+    .progress-bar { background: #2d6a4f; height: 100%; border-radius: 10px; transition: width 0.3s; }
+    #progress-text { font-size: 14px; color: #555; }
+    #progress-result { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .success { background: #d8f3dc; color: #1b4332; }
+    .error { background: #ffe5e5; color: #9b2226; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>📋 Bulk Student Upload</h1>
+    <a href="admin-dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <div class="content">
+
+    <!-- Step 1 — Download template -->
+    <div class="step-box">
+      <h2><div class="step-num">1</div> Download the Excel Template</h2>
+      <p>Download our Excel template and fill in the student details. Do not change the column headers. Fill one student per row.</p>
+      <button class="download-btn" onclick="downloadTemplate()">📥 Download Template</button>
+    </div>
+
+    <!-- Step 2 — Select school -->
+    <div class="step-box">
+      <h2><div class="step-num">2</div> Select the School</h2>
+      <p>Choose which school these students belong to.</p>
+      <select class="school-select" id="school-select">
+        <option value="">-- Select a school --</option>
+      </select>
+    </div>
+
+    <!-- Step 3 — Upload file -->
+    <div class="step-box">
+      <h2><div class="step-num">3</div> Upload the Filled Excel File</h2>
+      <p>Once you have filled the template, upload it here. We will show you a preview before saving.</p>
+
+      <div class="upload-area" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📂</div>
+        <p><strong>Click to select your Excel file</strong></p>
+        <p style="font-size:12px; margin-top:4px;">Supports .xlsx and .csv files</p>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
+      </div>
+
+      <div class="preview-box" id="preview-box">
+        <div class="preview-header">
+          <span>Preview</span>
+          <span id="preview-count"></span>
+        </div>
+        <div class="preview-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Class</th>
+                <th>Parent Phone</th>
+                <th>Parent WhatsApp</th>
+              </tr>
+            </thead>
+            <tbody id="preview-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <button class="upload-btn" id="upload-btn" onclick="uploadStudents()">
+        🚀 Upload All Students
+      </button>
+    </div>
+
+    <!-- Progress box -->
+    <div id="progress-box">
+      <h2>⏳ Uploading Students...</h2>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div id="progress-text">Starting upload...</div>
+      <div id="progress-result"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+
+    let db;
+    let studentsData = [];
+
+    async function init() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+      db = createClient(SUPABASE_URL, SUPABASE_KEY);
+      loadSchools();
+    }
+
+    async function loadSchools() {
+      const { data: schools } = await db.from('schools').select('*');
+      const select = document.getElementById('school-select');
+      if (schools) {
+        schools.forEach(school => {
+          const option = document.createElement('option');
+          option.value = school.id;
+          option.textContent = school.school_name;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    // Download Excel template
+    window.downloadTemplate = function() {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([
+        ['Full Name', 'Class', 'Parent Phone', 'Parent WhatsApp'],
+        ['Amaka Okonkwo', 'JSS 2A', '08012345678', '08012345678'],
+        ['Emeka Eze', 'JSS 1B', '08098765432', '08098765432'],
+      ]);
+      ws['!cols'] = [{ wch: 25 }, { wch: 12 }, { wch: 18 }, { wch: 18 }];
+      XLSX.utils.book_append_sheet(wb, ws, 'Students');
+      XLSX.writeFile(wb, 'SafeTrack_Student_Template.xlsx');
+    }
+
+    // Handle file upload
+    document.getElementById('file-input').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          // Skip header row
+          studentsData = [];
+          const previewBody = document.getElementById('preview-body');
+          previewBody.innerHTML = '';
+
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row[0]) continue; // skip empty rows
+
+            const student = {
+              full_name: row[0] ? row[0].toString().trim() : '',
+              class: row[1] ? row[1].toString().trim() : '',
+              parent_phone: row[2] ? row[2].toString().trim() : '',
+              parent_whatsapp: row[3] ? row[3].toString().trim() : ''
+            };
+
+            if (!student.full_name) continue;
+
+            studentsData.push(student);
+
+            previewBody.innerHTML += `
+              <tr>
+                <td>${student.full_name}</td>
+                <td>${student.class}</td>
+                <td>${student.parent_phone}</td>
+                <td>${student.parent_whatsapp}</td>
+              </tr>`;
+          }
+
+          document.getElementById('preview-count').textContent = studentsData.length + ' students found';
+          document.getElementById('preview-box').style.display = 'block';
+          document.getElementById('upload-btn').style.display = 'block';
+
+        } catch(err) {
+          alert('Error reading file: ' + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // Upload students to database
+    window.uploadStudents = async function() {
+      const schoolId = document.getElementById('school-select').value;
+
+      if (!schoolId) {
+        alert('Please select a school first!');
+        return;
+      }
+
+      if (studentsData.length === 0) {
+        alert('No students found in the file!');
+        return;
+      }
+
+      // Get school name
+      const { data: school } = await db
+        .from('schools')
+        .select('school_name')
+        .eq('id', schoolId)
+        .single();
+
+      const schoolName = school ? school.school_name : '';
+
+      document.getElementById('upload-btn').disabled = true;
+      document.getElementById('progress-box').style.display = 'block';
+
+      let success = 0;
+      let failed = 0;
+
+      for (let i = 0; i < studentsData.length; i++) {
+        const student = studentsData[i];
+        const qr_code = 'ST-' + Date.now() + '-' + i;
+
+        const { error } = await db.from('students').insert([{
+          full_name: student.full_name,
+          class: student.class,
+          school_name: schoolName,
+          parent_phone: student.parent_phone,
+          parent_whatsapp: student.parent_whatsapp,
+          qr_code: qr_code,
+          school_id: parseInt(schoolId)
+        }]);
+
+        if (error) {
+          failed++;
+        } else {
+          success++;
+        }
+
+        // Update progress
+        const percent = Math.round(((i + 1) / studentsData.length) * 100);
+        document.getElementById('progress-bar').style.width = percent + '%';
+        document.getElementById('progress-text').textContent =
+          'Uploading ' + (i + 1) + ' of ' + studentsData.length + ' students...';
+
+        // Small delay to avoid overwhelming the database
+        await new Promise(r => setTimeout(r, 100));
+      }
+
+      // Show result
+      const resultEl = document.getElementById('progress-result');
+      if (failed === 0) {
+        resultEl.textContent = '🎉 Success! ' + success + ' students registered successfully!';
+        resultEl.className = 'success';
+      } else {
+        resultEl.textContent = '⚠️ ' + success + ' students registered. ' + failed + ' failed.';
+        resultEl.className = 'error';
+      }
+      resultEl.style.display = 'block';
+      document.getElementById('progress-text').textContent = 'Upload complete!';
+      document.getElementById('upload-btn').disabled = false;
+    }
+
+    init();
+  </script>
+</body>
+</html>
