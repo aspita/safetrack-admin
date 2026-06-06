@@ -109,19 +109,31 @@
     // Beep sound
     function beep() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = ctx.createOscillator();
-        const gain = ctx.createGain();
-        oscillator.connect(gain);
-        gain.connect(ctx.destination);
-        oscillator.type = 'sine';
-        oscillator.frequency.value = 1200;
-        gain.gain.setValueAtTime(1, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.3);
-      } catch(e) {}
-    }
+        const ctx = nfunction beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 1200;
+    gain.gain.setValueAtTime(1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+function speak(message) {
+  try {
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.lang = 'en-NG';
+    utterance.rate = 0.9;
+    utterance.pitch = 1.1;
+    window.speechSynthesis.speak(utterance);
+  } catch(e) {}
+}
 
     // Show scan result
     function showScanResult(text, type) {
@@ -197,12 +209,13 @@
         const time = new Date().toLocaleTimeString('en-NG', {
           hour: '2-digit', minute: '2-digit', hour12: true
         });
-        showScanResult(
-          currentMode === 'arrival'
-            ? '✅ ' + data.full_name + ' arrived at ' + time
-            : '🚪 ' + data.full_name + ' departed at ' + time,
-          'success'
-        );
+        if (currentMode === 'arrival') {
+  speak('Welcome to school ' + data.full_name);
+  showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
+} else {
+  speak('Bye bye ' + data.full_name + ', have a safe journey home');
+  showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
+}
       }
     }
 
