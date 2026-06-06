@@ -1,0 +1,24 @@
+{
+  "name": "SafeTrack Gate",
+  "short_name": "SafeTrack Gate",
+  "description": "SafeTrack Gate Scanner",
+  "start_url": "/gate.html",
+  "display": "standalone",
+  "background_color": "#2d6a4f",
+  "theme_color": "#2d6a4f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
