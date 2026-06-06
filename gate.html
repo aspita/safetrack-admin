@@ -91,31 +91,67 @@
     let voiceReady = false;
 
     // Activate voice on tap
-  window.activateVoice = function() {
+ window.activateVoice = function() {
   window.speechSynthesis.cancel();
   const test = new SpeechSynthesisUtterance('Yay! SafeTrack is ready! Have a wonderful day!');
   test.lang = 'en-GB';
   test.pitch = 1.8;
   test.rate = 1.1;
   test.volume = 1;
+
+  const voices = window.speechSynthesis.getVoices();
+  const femaleVoice = voices.find(v =>
+    v.name.toLowerCase().includes('female') ||
+    v.name.toLowerCase().includes('woman') ||
+    v.name.includes('Samantha') ||
+    v.name.includes('Victoria') ||
+    v.name.includes('Karen') ||
+    v.name.includes('Moira') ||
+    v.name.includes('Tessa') ||
+    v.name.includes('Fiona') ||
+    v.name.includes('Veena') ||
+    v.name.includes('Zira') ||
+    v.name.includes('Hazel') ||
+    v.name.includes('Susan') ||
+    v.name.includes('Google UK English Female') ||
+    v.name.includes('Google US English')
+  );
+
+  if (femaleVoice) {
+    test.voice = femaleVoice;
+  }
+
   window.speechSynthesis.speak(test);
   voiceReady = true;
   document.getElementById('voice-banner').style.display = 'none';
 }
 
-function speak(message) {
-  try {
-    if (!voiceReady) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(message);
-    utterance.lang = 'en-GB';
-    utterance.rate = 1.1;
-    utterance.pitch = 1.8;
-    utterance.volume = 1;
+    // Get all available voices and pick a female one
+    const voices = window.speechSynthesis.getVoices();
+    const femaleVoice = voices.find(v =>
+      v.name.toLowerCase().includes('female') ||
+      v.name.toLowerCase().includes('woman') ||
+      v.name.includes('Samantha') ||
+      v.name.includes('Victoria') ||
+      v.name.includes('Karen') ||
+      v.name.includes('Moira') ||
+      v.name.includes('Tessa') ||
+      v.name.includes('Fiona') ||
+      v.name.includes('Veena') ||
+      v.name.includes('Zira') ||
+      v.name.includes('Hazel') ||
+      v.name.includes('Susan') ||
+      v.name.includes('Google UK English Female') ||
+      v.name.includes('Google US English')
+    );
+
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+
     window.speechSynthesis.speak(utterance);
   } catch(e) {}
 }
-
     // Tab switching
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
