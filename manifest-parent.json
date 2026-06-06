@@ -1,6 +1,6 @@
 {
-  "name": "SafeTrack Parent",
-  "short_name": "SafeTrack",
+  "name": "SafeTrack Parent App",
+  "short_name": "ST Parent",
   "description": "SafeTrack Parent Portal",
   "start_url": "/parent-login.html",
   "display": "standalone",
