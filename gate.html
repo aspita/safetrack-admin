@@ -11,6 +11,7 @@
     .header { background: #2d6a4f; color: white; padding: 16px 20px; text-align: center; }
     .header h1 { font-size: 20px; }
     .header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+    .voice-banner { background: #f4a261; padding: 12px; text-align: center; font-size: 14px; font-weight: bold; color: white; cursor: pointer; }
     .tabs { display: flex; background: #1b4332; }
     .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-size: 15px; opacity: 0.6; border: none; background: none; }
     .tab.active { opacity: 1; border-bottom: 3px solid white; font-weight: bold; }
@@ -44,6 +45,10 @@
   <div class="header">
     <h1>🛡️ SafeTrack Gate</h1>
     <p>School gate management system</p>
+  </div>
+
+  <div class="voice-banner" id="voice-banner" onclick="activateVoice()">
+    🔊 Tap here to activate voice
   </div>
 
   <div class="tabs">
@@ -83,6 +88,32 @@
     let currentMode = 'arrival';
     let scanning = true;
     let scannerStarted = false;
+    let voiceReady = false;
+
+    // Activate voice on tap
+    window.activateVoice = function() {
+      window.speechSynthesis.cancel();
+      const test = new SpeechSynthesisUtterance('Voice activated. Welcome to SafeTrack.');
+      test.lang = 'en-GB';
+      test.volume = 1;
+      window.speechSynthesis.speak(test);
+      voiceReady = true;
+      document.getElementById('voice-banner').style.display = 'none';
+    }
+
+    // Speak function
+    function speak(message) {
+      try {
+        if (!voiceReady) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    }
 
     // Tab switching
     window.switchTab = function(tab) {
@@ -117,19 +148,6 @@
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
         oscillator.start(ctx.currentTime);
         oscillator.stop(ctx.currentTime + 0.3);
-      } catch(e) {}
-    }
-
-    // Voice speech
-    function speak(message) {
-      try {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(message);
-        utterance.lang = 'en-GB';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.1;
-        utterance.volume = 1;
-        window.speechSynthesis.speak(utterance);
       } catch(e) {}
     }
 
@@ -266,6 +284,8 @@
 
       await db.from('pickup_pins').update({ used: true }).eq('id', data.id);
 
+      speak('Access granted. Please release ' + data.students.full_name + ' to ' + data.pickup_name);
+
       resultEl.innerHTML = `
         <div class="result-icon">✅</div>
         <div class="result-name">${data.students.full_name}</div>
@@ -273,7 +293,6 @@
       resultEl.className = 'success';
       resultEl.style.display = 'block';
 
-      speak('Access granted. Please release ' + data.students.full_name + ' to ' + data.pickup_name);
       document.getElementById('pin-input').value = '';
     });
 
