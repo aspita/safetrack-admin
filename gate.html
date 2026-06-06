@@ -103,7 +103,7 @@ async function sendEmailNotification(studentName, parentEmail, schoolName, scanT
     const time = now.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
     const date = now.toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-    await emailjs.send('service_q0gvvj4', 'Template_fyrniim', {
+    await emailjs.send('service_q0gvvj4', 'template_fyrniim', {
       student_name: studentName,
       parent_email: parentEmail,
       school_name: schoolName,
