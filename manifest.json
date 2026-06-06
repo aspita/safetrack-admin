@@ -2,7 +2,7 @@
   "name": "SafeTrack School Safety",
   "short_name": "SafeTrack",
   "description": "Keeping Nigerian school children safe",
-  "start_url": "/home.html",
+  "start_url": "/gate.html",
   "display": "standalone",
   "background_color": "#2d6a4f",
   "theme_color": "#2d6a4f",
