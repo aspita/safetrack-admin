@@ -28,6 +28,8 @@
   <input type="text" id="parent_phone" placeholder="e.g. 08012345678">
   <label>Parent WhatsApp Number</label>
   <input type="text" id="parent_whatsapp" placeholder="e.g. 08012345678">
+  <label>Parent Email Address</label>
+<input type="email" id="parent_email" placeholder="e.g. parent@gmail.com">
   <button onclick="addStudent()">Register Student</button>
   <div id="message"></div>
 
@@ -51,6 +53,7 @@
       const school_name = document.getElementById('school_name').value.trim();
       const parent_phone = document.getElementById('parent_phone').value.trim();
       const parent_whatsapp = document.getElementById('parent_whatsapp').value.trim();
+      const parent_email = document.getElementById('parent_email').value.trim();
 
       if (!full_name || !cls || !school_name || !parent_phone || !parent_whatsapp) {
         showMessage('Please fill in all fields.', 'error');
@@ -64,9 +67,9 @@ if (!school_id) {
   return;
 }
 
-     const { error } = await db.from('students').insert([{
+    const { error } = await db.from('students').insert([{
   full_name, class: cls, school_name,
-  parent_phone, parent_whatsapp, qr_code,
+  parent_phone, parent_whatsapp, parent_email, qr_code,
   school_id: parseInt(school_id)
 }]);
 
