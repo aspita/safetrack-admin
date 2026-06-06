@@ -78,80 +78,79 @@
     </div>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
+  <script>
     const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentMode = 'arrival';
     let scanning = true;
     let scannerStarted = false;
     let voiceReady = false;
+    let db;
 
-    // Activate voice on tap
- window.activateVoice = function() {
-  window.speechSynthesis.cancel();
-  const test = new SpeechSynthesisUtterance('Yay! SafeTrack is ready! Have a wonderful day!');
-  test.lang = 'en-GB';
-  test.pitch = 1.8;
-  test.rate = 1.1;
-  test.volume = 1;
-
-  const voices = window.speechSynthesis.getVoices();
-  const femaleVoice = voices.find(v =>
-    v.name.toLowerCase().includes('female') ||
-    v.name.toLowerCase().includes('woman') ||
-    v.name.includes('Samantha') ||
-    v.name.includes('Victoria') ||
-    v.name.includes('Karen') ||
-    v.name.includes('Moira') ||
-    v.name.includes('Tessa') ||
-    v.name.includes('Fiona') ||
-    v.name.includes('Veena') ||
-    v.name.includes('Zira') ||
-    v.name.includes('Hazel') ||
-    v.name.includes('Susan') ||
-    v.name.includes('Google UK English Female') ||
-    v.name.includes('Google US English')
-  );
-
-  if (femaleVoice) {
-    test.voice = femaleVoice;
-  }
-
-  window.speechSynthesis.speak(test);
-  voiceReady = true;
-  document.getElementById('voice-banner').style.display = 'none';
-}
-
-    // Get all available voices and pick a female one
-    const voices = window.speechSynthesis.getVoices();
-    const femaleVoice = voices.find(v =>
-      v.name.toLowerCase().includes('female') ||
-      v.name.toLowerCase().includes('woman') ||
-      v.name.includes('Samantha') ||
-      v.name.includes('Victoria') ||
-      v.name.includes('Karen') ||
-      v.name.includes('Moira') ||
-      v.name.includes('Tessa') ||
-      v.name.includes('Fiona') ||
-      v.name.includes('Veena') ||
-      v.name.includes('Zira') ||
-      v.name.includes('Hazel') ||
-      v.name.includes('Susan') ||
-      v.name.includes('Google UK English Female') ||
-      v.name.includes('Google US English')
-    );
-
-    if (femaleVoice) {
-      utterance.voice = femaleVoice;
+    // Load Supabase
+    async function loadSupabase() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+      db = createClient(SUPABASE_URL, SUPABASE_KEY);
+      startScanner();
     }
 
-    window.speechSynthesis.speak(utterance);
-  } catch(e) {}
-}
+    // Get female voice
+    function getFemaleVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find(v =>
+        v.name.includes('Google UK English Female') ||
+        v.name.includes('Samantha') ||
+        v.name.includes('Victoria') ||
+        v.name.includes('Karen') ||
+        v.name.includes('Zira') ||
+        v.name.includes('Hazel') ||
+        v.name.toLowerCase().includes('female')
+      ) || voices.find(v => v.lang.startsWith('en')) || null;
+    }
+
+    // Activate voice
+    function activateVoice() {
+      window.speechSynthesis.cancel();
+
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance('Yay! SafeTrack is ready! Have a wonderful day!');
+        utterance.pitch = 1.8;
+        utterance.rate = 1.1;
+        utterance.volume = 1;
+        const voice = getFemaleVoice();
+        if (voice) utterance.voice = voice;
+        window.speechSynthesis.speak(utterance);
+        voiceReady = true;
+        document.getElementById('voice-banner').style.display = 'none';
+      }, 100);
+    }
+
+    // Make activateVoice global
+    window.activateVoice = activateVoice;
+
+    // Speak function
+    function speak(message) {
+      if (!voiceReady) return;
+      try {
+        window.speechSynthesis.cancel();
+        setTimeout(() => {
+          const utterance = new SpeechSynthesisUtterance(message);
+          utterance.pitch = 1.8;
+          utterance.rate = 1.1;
+          utterance.volume = 1;
+          const voice = getFemaleVoice();
+          if (voice) utterance.voice = voice;
+          window.speechSynthesis.speak(utterance);
+        }, 100);
+      } catch(e) {}
+    }
+
+    // Load voices
+    window.speechSynthesis.onvoiceschanged = function() {
+      getFemaleVoice();
+    };
+
     // Tab switching
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -202,7 +201,7 @@
 
     // Handle QR scan
     async function onScan(qrCode) {
-      if (!scanning) return;
+      if (!scanning || !db) return;
       scanning = false;
 
       const { data, error } = await db
@@ -217,7 +216,6 @@
         return;
       }
 
-      // Get last attendance record
       const { data: lastLog } = await db
         .from('attendance_logs')
         .select('*')
@@ -228,21 +226,18 @@
 
       const lastScan = lastLog ? lastLog.scan_type : null;
 
-      // Block double arrival
       if (currentMode === 'arrival' && lastScan === 'arrival') {
         beep();
-        showScanResult('⚠️ ' + data.full_name + ' already arrived! They must depart first.', 'error');
+        showScanResult('⚠️ ' + data.full_name + ' already arrived! Must depart first.', 'error');
         return;
       }
 
-      // Block departure without arrival
       if (currentMode === 'departure' && (lastScan === null || lastScan === 'departure')) {
         beep();
-        showScanResult('⚠️ ' + data.full_name + ' has not arrived yet! Arrival must come first.', 'error');
+        showScanResult('⚠️ ' + data.full_name + ' has not arrived yet!', 'error');
         return;
       }
 
-      // Log the attendance
       const { error: logError } = await db.from('attendance_logs').insert([{
         student_id: data.id,
         scan_type: currentMode,
@@ -250,36 +245,38 @@
       }]);
 
       if (logError) {
-        showScanResult('Error logging: ' + logError.message, 'error');
+        showScanResult('Error: ' + logError.message, 'error');
       } else {
         beep();
         const time = new Date().toLocaleTimeString('en-NG', {
           hour: '2-digit', minute: '2-digit', hour12: true
         });
-       if (currentMode === 'arrival') {
-  const welcomes = [
-    'Yay! Welcome to school ' + data.full_name + '! Ready to learn today?',
-    'Hello ' + data.full_name + '! So happy to see you! Have a super day!',
-    'Good morning ' + data.full_name + '! You made it! Let the learning begin!',
-    'Welcome welcome welcome ' + data.full_name + '! Today is going to be amazing!'
-  ];
-  speak(welcomes[Math.floor(Math.random() * welcomes.length)]);
-  showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
-} else {
-  const goodbyes = [
-    'Bye bye ' + data.full_name + '! You were amazing today! See you tomorrow!',
-    'Goodbye ' + data.full_name + '! Go home and rest! You did great today!',
-    'See you tomorrow ' + data.full_name + '! Have a safe and lovely journey home!',
-    'Bye bye ' + data.full_name + '! Don\'t forget to do your homework! See you soon!'
-  ];
-  speak(goodbyes[Math.floor(Math.random() * goodbyes.length)]);
-  showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
-}
+
+        if (currentMode === 'arrival') {
+          const welcomes = [
+            'Yay! Welcome to school ' + data.full_name + '! Ready to learn today?',
+            'Hello ' + data.full_name + '! So happy to see you! Have a super day!',
+            'Good morning ' + data.full_name + '! You made it! Let the learning begin!',
+            'Welcome welcome welcome ' + data.full_name + '! Today is going to be amazing!'
+          ];
+          speak(welcomes[Math.floor(Math.random() * welcomes.length)]);
+          showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
+        } else {
+          const goodbyes = [
+            'Bye bye ' + data.full_name + '! You were amazing today! See you tomorrow!',
+            'Goodbye ' + data.full_name + '! Go home and rest! You did great today!',
+            'See you tomorrow ' + data.full_name + '! Have a safe and lovely journey home!',
+            'Bye bye ' + data.full_name + '! Do not forget your homework! See you soon!'
+          ];
+          speak(goodbyes[Math.floor(Math.random() * goodbyes.length)]);
+          showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
+        }
       }
     }
 
     // Start scanner
     function startScanner() {
+      if (scannerStarted) return;
       const scanner = new Html5Qrcode('reader');
       scanner.start(
         { facingMode: 'environment' },
@@ -292,6 +289,7 @@
 
     // PIN verification
     document.getElementById('verify-btn').addEventListener('click', async function() {
+      if (!db) return;
       const pin = document.getElementById('pin-input').value.trim();
 
       if (!pin || pin.length !== 6) {
@@ -333,7 +331,7 @@
 
       await db.from('pickup_pins').update({ used: true }).eq('id', data.id);
 
-      speak('Access granted. Please release ' + data.students.full_name + ' to ' + data.pickup_name);
+      speak('Access granted! Please release ' + data.students.full_name + ' to ' + data.pickup_name);
 
       resultEl.innerHTML = `
         <div class="result-icon">✅</div>
@@ -345,8 +343,8 @@
       document.getElementById('pin-input').value = '';
     });
 
-    // Start scanner on load
-    startScanner();
+    // Initialize
+    loadSupabase();
   </script>
 </body>
 </html>
