@@ -51,7 +51,6 @@
     <button class="tab" id="tab-pin" onclick="switchTab('pin')">🔐 Verify PIN</button>
   </div>
 
-  <!-- SCANNER PAGE -->
   <div class="page active" id="page-scanner">
     <br>
     <div class="mode-buttons">
@@ -63,7 +62,6 @@
     <div id="scan-result"></div>
   </div>
 
-  <!-- PIN VERIFY PAGE -->
   <div class="page" id="page-pin">
     <br>
     <div class="pin-box">
@@ -85,7 +83,6 @@
     let currentMode = 'arrival';
     let scanning = true;
     let scannerStarted = false;
-    let scanner;
 
     // Tab switching
     window.switchTab = function(tab) {
@@ -109,31 +106,32 @@
     // Beep sound
     function beep() {
       try {
-        const ctx = nfunction beep() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.type = 'sine';
-    oscillator.frequency.value = 1200;
-    gain.gain.setValueAtTime(1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.3);
-  } catch(e) {}
-}
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 1200;
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.3);
+      } catch(e) {}
+    }
 
-function speak(message) {
-  try {
-    const utterance = new SpeechSynthesisUtterance(message);
-    utterance.lang = 'en-NG';
-    utterance.rate = 0.9;
-    utterance.pitch = 1.1;
-    window.speechSynthesis.speak(utterance);
-  } catch(e) {}
-}
+    // Voice speech
+    function speak(message) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    }
 
     // Show scan result
     function showScanResult(text, type) {
@@ -164,7 +162,7 @@ function speak(message) {
         return;
       }
 
-      // Get last attendance record for this student
+      // Get last attendance record
       const { data: lastLog } = await db
         .from('attendance_logs')
         .select('*')
@@ -178,20 +176,14 @@ function speak(message) {
       // Block double arrival
       if (currentMode === 'arrival' && lastScan === 'arrival') {
         beep();
-        showScanResult(
-          '⚠️ ' + data.full_name + ' already arrived! They must depart first.',
-          'error'
-        );
+        showScanResult('⚠️ ' + data.full_name + ' already arrived! They must depart first.', 'error');
         return;
       }
 
       // Block departure without arrival
       if (currentMode === 'departure' && (lastScan === null || lastScan === 'departure')) {
         beep();
-        showScanResult(
-          '⚠️ ' + data.full_name + ' has not arrived yet! Arrival must come first.',
-          'error'
-        );
+        showScanResult('⚠️ ' + data.full_name + ' has not arrived yet! Arrival must come first.', 'error');
         return;
       }
 
@@ -210,18 +202,18 @@ function speak(message) {
           hour: '2-digit', minute: '2-digit', hour12: true
         });
         if (currentMode === 'arrival') {
-  speak('Welcome to school ' + data.full_name);
-  showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
-} else {
-  speak('Bye bye ' + data.full_name + ', have a safe journey home');
-  showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
-}
+          speak('Welcome to school ' + data.full_name);
+          showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
+        } else {
+          speak('Bye bye ' + data.full_name + ', have a safe journey home');
+          showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
+        }
       }
     }
 
     // Start scanner
     function startScanner() {
-      scanner = new Html5Qrcode('reader');
+      const scanner = new Html5Qrcode('reader');
       scanner.start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 250, height: 250 } },
@@ -281,6 +273,7 @@ function speak(message) {
       resultEl.className = 'success';
       resultEl.style.display = 'block';
 
+      speak('Access granted. Please release ' + data.students.full_name + ' to ' + data.pickup_name);
       document.getElementById('pin-input').value = '';
     });
 
