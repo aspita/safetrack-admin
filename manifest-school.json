@@ -1,6 +1,6 @@
 {
-  "name": "SafeTrack School",
-  "short_name": "SafeTrack",
+  "name": "SafeTrack School App",
+  "short_name": "ST School",
   "description": "SafeTrack School Portal",
   "start_url": "/school-login.html",
   "display": "standalone",
