@@ -1,6 +1,6 @@
 {
-  "name": "SafeTrack Gate",
-  "short_name": "SafeTrack Gate",
+  "name": "SafeTrack Gate App",
+  "short_name": "ST Gate",
   "description": "SafeTrack Gate Scanner",
   "start_url": "/gate.html",
   "display": "standalone",
