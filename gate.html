@@ -91,29 +91,30 @@
     let voiceReady = false;
 
     // Activate voice on tap
-    window.activateVoice = function() {
-      window.speechSynthesis.cancel();
-      const test = new SpeechSynthesisUtterance('Voice activated. Welcome to SafeTrack.');
-      test.lang = 'en-GB';
-      test.volume = 1;
-      window.speechSynthesis.speak(test);
-      voiceReady = true;
-      document.getElementById('voice-banner').style.display = 'none';
-    }
+  window.activateVoice = function() {
+  window.speechSynthesis.cancel();
+  const test = new SpeechSynthesisUtterance('Yay! SafeTrack is ready! Have a wonderful day!');
+  test.lang = 'en-GB';
+  test.pitch = 1.8;
+  test.rate = 1.1;
+  test.volume = 1;
+  window.speechSynthesis.speak(test);
+  voiceReady = true;
+  document.getElementById('voice-banner').style.display = 'none';
+}
 
-    // Speak function
-    function speak(message) {
-      try {
-        if (!voiceReady) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(message);
-        utterance.lang = 'en-GB';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.1;
-        utterance.volume = 1;
-        window.speechSynthesis.speak(utterance);
-      } catch(e) {}
-    }
+function speak(message) {
+  try {
+    if (!voiceReady) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.lang = 'en-GB';
+    utterance.rate = 1.1;
+    utterance.pitch = 1.8;
+    utterance.volume = 1;
+    window.speechSynthesis.speak(utterance);
+  } catch(e) {}
+}
 
     // Tab switching
     window.switchTab = function(tab) {
@@ -219,13 +220,25 @@
         const time = new Date().toLocaleTimeString('en-NG', {
           hour: '2-digit', minute: '2-digit', hour12: true
         });
-        if (currentMode === 'arrival') {
-          speak('Welcome to school ' + data.full_name);
-          showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
-        } else {
-          speak('Bye bye ' + data.full_name + ', have a safe journey home');
-          showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
-        }
+       if (currentMode === 'arrival') {
+  const welcomes = [
+    'Yay! Welcome to school ' + data.full_name + '! Ready to learn today?',
+    'Hello ' + data.full_name + '! So happy to see you! Have a super day!',
+    'Good morning ' + data.full_name + '! You made it! Let the learning begin!',
+    'Welcome welcome welcome ' + data.full_name + '! Today is going to be amazing!'
+  ];
+  speak(welcomes[Math.floor(Math.random() * welcomes.length)]);
+  showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
+} else {
+  const goodbyes = [
+    'Bye bye ' + data.full_name + '! You were amazing today! See you tomorrow!',
+    'Goodbye ' + data.full_name + '! Go home and rest! You did great today!',
+    'See you tomorrow ' + data.full_name + '! Have a safe and lovely journey home!',
+    'Bye bye ' + data.full_name + '! Don\'t forget to do your homework! See you soon!'
+  ];
+  speak(goodbyes[Math.floor(Math.random() * goodbyes.length)]);
+  showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
+}
       }
     }
 
