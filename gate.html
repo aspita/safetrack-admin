@@ -105,6 +105,12 @@ async function sendEmailNotification(studentName, parentEmail, schoolName, scanT
     }
 
     const cleanEmail = parentEmail.trim().toLowerCase();
+
+// Validate it is actually an email address
+if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+  console.log('Invalid email address — skipping: ' + cleanEmail);
+  return;
+}
     console.log('Sending email to: ' + cleanEmail);
 
     const now = new Date();
