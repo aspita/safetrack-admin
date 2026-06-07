@@ -119,13 +119,13 @@
         const date = now.toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
         const templateParams = {
-          to_email: cleanEmail,
-          student_name: studentName,
-          school_name: schoolName,
-          scan_type: scanType === 'arrival' ? 'arrived at' : 'departed from',
-          scan_time: time,
-          scan_date: date
-        };
+  email: cleanEmail,
+  student_name: studentName,
+  school_name: schoolName,
+  scan_type: scanType === 'arrival' ? 'arrived at' : 'departed from',
+  scan_time: time,
+  scan_date: date
+};
 
         const response = await emailjs.send('service_q0gvvj4', 'template_fyrniim', templateParams);
         console.log('Email sent successfully!', response);
