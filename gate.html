@@ -99,20 +99,25 @@ emailjs.init('z4gR1MZtm1l4a2y1E');
 // Send email notification
 async function sendEmailNotification(studentName, parentEmail, schoolName, scanType) {
   try {
+    if (!parentEmail || parentEmail === '' || parentEmail === null) {
+      console.log('No email address for this student — skipping notification');
+      return;
+    }
+
     const now = new Date();
     const time = now.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true });
     const date = now.toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
     await emailjs.send('service_q0gvvj4', 'template_fyrniim', {
-  to_email: parentEmail,
-  student_name: studentName,
-  school_name: schoolName,
-  scan_type: scanType === 'arrival' ? 'arrived at' : 'departed from',
-  scan_time: time,
-  scan_date: date
-});
+      to_email: parentEmail,
+      student_name: studentName,
+      school_name: schoolName,
+      scan_type: scanType === 'arrival' ? 'arrived at' : 'departed from',
+      scan_time: time,
+      scan_date: date
+    });
 
-    console.log('Email sent successfully!');
+    console.log('Email sent successfully to ' + parentEmail);
   } catch(err) {
     console.log('Email error:', err);
   }
