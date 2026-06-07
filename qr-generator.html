@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — ID Card Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    .header { background: #1b4332; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 20px; }
+    .header a { color: white; font-size: 13px; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 14px; border-radius: 6px; }
+    .controls { max-width: 900px; margin: 20px auto; padding: 0 20px; }
+    .control-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .control-box h2 { font-size: 15px; color: #1b4332; margin-bottom: 12px; }
+    select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; margin-bottom: 8px; }
+    .btn-green { background: #1b4332; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 15px; cursor: pointer; width: 100%; }
+    .btn-green:hover { background: #2d6a4f; }
+    .print-btn { background: #2d6a4f; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; display: none; }
+
+    /* CARDS GRID */
+    .cards-grid { max-width: 900px; margin: 0 auto; padding: 0 20px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+
+    /* CARD WRAPPER - front and back */
+    .card-wrapper { display: flex; flex-direction: column; gap: 10px; }
+
+    /* FRONT OF CARD */
+    .card-front {
+      width: 100%;
+      aspect-ratio: 54/86;
+      background: linear-gradient(170deg, #1b4332 0%, #2d6a4f 60%, #1b4332 100%);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    /* Decorative diagonal pattern */
+    .card-front::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 20px
+      );
+    }
+
+    .card-top { width: 100%; padding: 14px 14px 8px; display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+    .school-logo { width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); }
+    .school-info h3 { color: white; font-size: 12px; font-weight: bold; line-height: 1.2; }
+    .school-info p { color: rgba(255,255,255,0.7); font-size: 9px; margin-top: 2px; }
+
+    .card-photo-wrap { position: relative; z-index: 1; margin: 6px 0; }
+    .card-photo { width: 110px; height: 120px; border-radius: 10px; border: 3px solid rgba(255,255,255,0.9); background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .card-photo .photo-placeholder { font-size: 50px; opacity: 0.6; }
+
+    .card-class { position: relative; z-index: 1; color: white; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin: 6px 0; }
+
+    .card-divider { width: 80%; height: 1px; background: rgba(255,255,255,0.2); margin: 4px 0; position: relative; z-index: 1; }
+
+    .card-qr-section { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 6px; }
+    .card-qr-label { color: rgba(255,255,255,0.6); font-size: 8px; letter-spacing: 2px; margin-bottom: 6px; }
+    .card-qr { background: white; padding: 6px; border-radius: 6px; }
+
+    .card-bottom { width: 100%; padding: 6px 10px; background: rgba(0,0,0,0.2); position: relative; z-index: 1; text-align: center; }
+    .card-bottom p { color: rgba(255,255,255,0.6); font-size: 7px; }
+
+    /* BACK OF CARD */
+    .card-back {
+      width: 100%;
+      aspect-ratio: 54/86;
+      background: linear-gradient(170deg, #1b4332 0%, #2d6a4f 60%, #1b4332 100%);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    .card-back::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 20px
+      );
+    }
+
+    .back-emergency { position: relative; z-index: 1; text-align: center; }
+    .back-emergency p { color: rgba(255,255,255,0.7); font-size: 9px; line-height: 1.6; }
+    .back-emergency h3 { color: white; font-size: 13px; font-weight: bold; margin: 4px 0; }
+    .back-emergency .contact { color: rgba(255,255,255,0.8); font-size: 9px; }
+
+    .back-divider { width: 80%; height: 1px; background: rgba(255,255,255,0.2); position: relative; z-index: 1; }
+
+    .back-terms { position: relative; z-index: 1; width: 100%; }
+    .back-terms h4 { color: white; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-align: center; }
+    .back-terms ul { list-style: none; padding: 0; }
+    .back-terms ul li { color: rgba(255,255,255,0.8); font-size: 8px; line-height: 1.5; padding: 3px 0 3px 12px; position: relative; }
+    .back-terms ul li::before { content: '•'; position: absolute; left: 0; color: rgba(255,255,255,0.5); }
+
+    .back-signature { position: relative; z-index: 1; text-align: center; width: 100%; }
+    .signature-line { border-top: 1px solid rgba(255,255,255,0.4); margin: 0 20px 4px; }
+    .back-signature p { color: rgba(255,255,255,0.8); font-size: 8px; }
+    .back-signature .principal { color: white; font-size: 9px; font-weight: bold; }
+
+    #loading { text-align: center; padding: 30px; color: #777; display: none; font-size: 15px; }
+
+    @media print {
+      .header, .controls, .print-btn, #loading { display: none !important; }
+      body { background: white; }
+      .cards-grid { margin: 0; padding: 10px; max-width: 100%; }
+      .card-front, .card-back { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🪪 ID Card Generator</h1>
+    <a href="admin-dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <div class="controls">
+
+    <div class="control-box">
+      <h2>Select School</h2>
+      <select id="school-select">
+        <option value="">-- Select a school --</option>
+      </select>
+    </div>
+
+    <div class="control-box">
+      <h2>School Details for ID Card</h2>
+      <input type="text" id="school-address" placeholder="School address e.g. 12 Lagos Street, Ikeja">
+      <input type="text" id="school-phone" placeholder="School phone e.g. 08012345678">
+      <input type="text" id="principal-name" placeholder="Principal name e.g. Mr. John Adeyemi">
+      <input type="text" id="principal-title" placeholder="Principal title e.g. High School Principal">
+      <input type="text" id="session" placeholder="Session e.g. 2025 / 2026">
+    </div>
+
+    <button class="btn-green" id="generate-btn">🪪 Generate All ID Cards</button>
+    <br><br>
+    <button class="print-btn" id="print-btn" onclick="window.print()">🖨️ Print All ID Cards</button>
+
+  </div>
+
+  <div id="loading">⏳ Generating ID cards... please wait</div>
+
+  <div class="cards-grid" id="cards-container"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+
+    let db;
+
+    async function init() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+      db = createClient(SUPABASE_URL, SUPABASE_KEY);
+      loadSchools();
+    }
+
+    async function loadSchools() {
+      const { data: schools } = await db.from('schools').select('*');
+      const select = document.getElementById('school-select');
+      if (schools) {
+        schools.forEach(school => {
+          const option = document.createElement('option');
+          option.value = school.id;
+          option.textContent = school.school_name;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    document.getElementById('generate-btn').addEventListener('click', async function() {
+      const schoolId = document.getElementById('school-select').value;
+      if (!schoolId) { alert('Please select a school!'); return; }
+
+      const address = document.getElementById('school-address').value || 'School Address';
+      const phone = document.getElementById('school-phone').value || 'School Phone';
+      const principalName = document.getElementById('principal-name').value || 'School Principal';
+      const principalTitle = document.getElementById('principal-title').value || 'Principal';
+      const session = document.getElementById('session').value || '2025 / 2026';
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('cards-container').innerHTML = '';
+      document.getElementById('print-btn').style.display = 'none';
+
+      const { data: school } = await db
+        .from('schools').select('*').eq('id', schoolId).single();
+
+      const { data: students } = await db
+        .from('students').select('*').eq('school_id', schoolId);
+
+      if (!students || students.length === 0) {
+        document.getElementById('loading').textContent = 'No students found!';
+        return;
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      const container = document.getElementById('cards-container');
+
+      for (let i = 0; i < students.length; i++) {
+        const student = students[i];
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-wrapper';
+
+        // FRONT
+        const front = document.createElement('div');
+        front.className = 'card-front';
+        front.innerHTML = `
+          <div class="card-top">
+            <div class="school-logo">🛡️</div>
+            <div class="school-info">
+              <h3>${school.school_name}</h3>
+              <p>${address}</p>
+              <p>${phone}</p>
+            </div>
+          </div>
+          <div class="card-photo-wrap">
+            <div class="card-photo">
+              <span class="photo-placeholder">👤</span>
+            </div>
+          </div>
+          <div class="card-class">${student.class || 'Class Placeholder'}</div>
+          <div class="card-divider"></div>
+          <div class="card-qr-section">
+            <div class="card-qr-label">SCAN TO VERIFY</div>
+            <div class="card-qr" id="qr-front-${i}"></div>
+          </div>
+          <div class="card-bottom">
+            <p>safetrack-admin.vercel.app</p>
+          </div>
+        `;
+
+        // BACK
+        const back = document.createElement('div');
+        back.className = 'card-back';
+        back.innerHTML = `
+          <div class="back-emergency">
+            <p>In case of emergency, please contact:</p>
+            <h3>${school.school_name}</h3>
+            <p class="contact">${address}</p>
+            <p class="contact">${phone}</p>
+          </div>
+          <div class="back-divider"></div>
+          <div class="back-terms">
+            <h4>ID Terms of Use</h4>
+            <ul>
+              <li>This ID is valid only for the ${session} session.</li>
+              <li>This ID is non-transferable and must be used only by the assigned student.</li>
+              <li>This ID must be worn at all times while inside the school premises.</li>
+              <li>Lost ID cards must be reported to the school immediately.</li>
+            </ul>
+          </div>
+          <div class="back-signature">
+            <div class="signature-line"></div>
+            <p class="principal">${principalName}</p>
+            <p>${principalTitle}</p>
+          </div>
+        `;
+
+        wrapper.appendChild(front);
+        wrapper.appendChild(back);
+        container.appendChild(wrapper);
+
+        // Generate QR code on front
+        new QRCode(document.getElementById('qr-front-' + i), {
+          text: student.qr_code,
+          width: 75,
+          height: 75,
+          colorDark: '#1b4332',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        await new Promise(r => setTimeout(r, 50));
+      }
+
+      const printBtn = document.getElementById('print-btn');
+      printBtn.style.display = 'block';
+      printBtn.textContent = `🖨️ Print All ${students.length} ID Cards`;
+    });
+
+    init();
+  </script>
+</body>
+</html>
