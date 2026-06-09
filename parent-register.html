@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — Register My Child</title>
+  <link rel="manifest" href="manifest-parent.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f0f7f4; min-height: 100vh; }
+
+    .header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+    .header button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    .header h1 { font-size: 18px; }
+
+    /* Progress bar */
+    .progress-wrap { background: #1b4332; padding: 12px 20px; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; height: 6px; }
+    .progress-fill { background: white; border-radius: 10px; height: 6px; transition: width 0.3s; }
+    .progress-label { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 6px; text-align: center; }
+
+    .content { max-width: 500px; margin: 0 auto; padding: 24px 20px; }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .step-title { font-size: 20px; font-weight: bold; color: #1b4332; margin-bottom: 6px; }
+    .step-subtitle { font-size: 14px; color: #777; margin-bottom: 24px; }
+
+    label { display: block; margin-top: 16px; font-weight: bold; font-size: 14px; color: #333; }
+    input, select { width: 100%; padding: 14px; margin-top: 6px; border: 1px solid #ccc; border-radius: 10px; font-size: 15px; box-sizing: border-box; background: white; }
+    input:focus, select:focus { border-color: #2d6a4f; outline: none; }
+
+    .next-btn { margin-top: 32px; width: 100%; padding: 16px; background: #2d6a4f; color: white; border: none; border-radius: 10px; font-size: 17px; font-weight: bold; cursor: pointer; }
+    .next-btn:hover { background: #1b4332; }
+    .next-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* Photo step */
+    .photo-area { margin: 20px 0; }
+    .photo-preview { width: 160px; height: 180px; border-radius: 12px; border: 3px dashed #2d6a4f; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; overflow: hidden; background: #f0f7f4; cursor: pointer; }
+    .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-preview .placeholder { font-size: 60px; opacity: 0.4; }
+    .photo-btns { display: flex; gap: 10px; }
+    .photo-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: bold; }
+    .photo-btn.camera { background: #2d6a4f; color: white; }
+    .photo-btn.gallery { background: white; color: #2d6a4f; border: 2px solid #2d6a4f; }
+    #camera-input { display: none; }
+    #gallery-input { display: none; }
+
+    /* Review step */
+    .review-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    .review-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+    .review-row:last-child { border-bottom: none; }
+    .review-row .label { color: #777; }
+    .review-row .value { font-weight: bold; color: #333; }
+    .review-photo { width: 80px; height: 90px; border-radius: 8px; object-fit: cover; margin: 0 auto 12px; display: block; }
+
+    /* Success step */
+    .success-box { text-align: center; padding: 20px 0; }
+    .success-icon { font-size: 64px; margin-bottom: 16px; }
+    .success-box h2 { font-size: 22px; color: #1b4332; margin-bottom: 8px; }
+    .success-box p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 16px; }
+    .qr-display { background: white; border-radius: 16px; padding: 20px; text-align: center; margin: 16px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .qr-display h3 { font-size: 14px; color: #777; margin-bottom: 12px; }
+    .qr-code-text { font-size: 18px; font-weight: bold; color: #1b4332; letter-spacing: 2px; background: #f0f7f4; padding: 12px; border-radius: 8px; margin: 8px 0; }
+    .screenshot-note { background: #fff8e1; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #e65100; margin: 12px 0; }
+    .login-now-btn { width: 100%; padding: 14px; background: #2d6a4f; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+
+    #message { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; text-align: center; }
+    .error { background: #ffe5e5; color: #9b2226; }
+    .success { background: #d8f3dc; color: #1b4332; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <button onclick="goBack()">←</button>
+    <h1>Register My Child</h1>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:25%"></div>
+    </div>
+    <div class="progress-label" id="progress-label">Step 1 of 4</div>
+  </div>
+
+  <div class="content">
+
+    <!-- STEP 1 — Child Details -->
+    <div class="step active" id="step-1">
+      <div class="step-title">Child's Details</div>
+      <div class="step-subtitle">Tell us about your child</div>
+
+      <label>Child's Full Name</label>
+      <input type="text" id="full_name" placeholder="e.g. Amaka Okonkwo">
+
+      <label>Class</label>
+      <input type="text" id="class" placeholder="e.g. JSS 2A or Grade 5">
+
+      <label>School</label>
+      <select id="school_id">
+        <option value="">-- Select your child's school --</option>
+      </select>
+
+      <button class="next-btn" id="next-1">Next →</button>
+    </div>
+
+    <!-- STEP 2 — Child Photo -->
+    <div class="step" id="step-2">
+      <div class="step-title">Child's Photo</div>
+      <div class="step-subtitle">Take a clear passport photo of your child</div>
+
+      <div class="photo-area">
+        <div class="photo-preview" id="photo-preview">
+          <span class="placeholder">👤</span>
+        </div>
+        <div class="photo-btns">
+          <button class="photo-btn camera" onclick="document.getElementById('camera-input').click()">📷 Take Photo</button>
+          <button class="photo-btn gallery" onclick="document.getElementById('gallery-input').click()">🖼️ Choose Photo</button>
+        </div>
+        <input type="file" id="camera-input" accept="image/*" capture="user">
+        <input type="file" id="gallery-input" accept="image/*">
+      </div>
+
+      <div id="message"></div>
+      <button class="next-btn" id="next-2">Next →</button>
+    </div>
+
+    <!-- STEP 3 — Parent Details -->
+    <div class="step" id="step-3">
+      <div class="step-title">Your Details</div>
+      <div class="step-subtitle">How do we contact you?</div>
+
+      <label>Your Phone Number</label>
+      <input type="tel" id="parent_phone" placeholder="e.g. 08012345678">
+
+      <label>Your WhatsApp Number</label>
+      <input type="tel" id="parent_whatsapp" placeholder="e.g. 08012345678">
+
+      <label>Your Email (optional)</label>
+      <input type="email" id="parent_email" placeholder="e.g. yourname@gmail.com">
+
+      <button class="next-btn" id="next-3">Next →</button>
+    </div>
+
+    <!-- STEP 4 — Review -->
+    <div class="step" id="step-4">
+      <div class="step-title">Review & Confirm</div>
+      <div class="step-subtitle">Please check everything is correct</div>
+
+      <div class="review-card">
+        <img id="review-photo" class="review-photo" src="" alt="Child photo">
+        <div class="review-row">
+          <span class="label">Full Name</span>
+          <span class="value" id="review-name"></span>
+        </div>
+        <div class="review-row">
+          <span class="label">Class</span>
+          <span class="value" id="review-class"></span>
+        </div>
+        <div class="review-row">
+          <span class="label">School</span>
+          <span class="value" id="review-school"></span>
+        </div>
+        <div class="review-row">
+          <span class="label">Phone</span>
+          <span class="value" id="review-phone"></span>
+        </div>
+        <div class="review-row">
+          <span class="label">WhatsApp</span>
+          <span class="value" id="review-whatsapp"></span>
+        </div>
+      </div>
+
+      <div id="message"></div>
+      <button class="next-btn" id="submit-btn">✅ Confirm & Register</button>
+    </div>
+
+    <!-- STEP 5 — Success -->
+    <div class="step" id="step-5">
+      <div class="success-box">
+        <div class="success-icon">🎉</div>
+        <h2>Registration Successful!</h2>
+        <p>Your child has been registered on SafeTrack. Your ID card will be printed and delivered to the school within 48 hours.</p>
+
+        <div class="qr-display">
+          <h3>Your child's QR Code</h3>
+          <div class="qr-code-text" id="success-qr"></div>
+          <div id="qr-image"></div>
+        </div>
+
+        <div class="screenshot-note">
+          📸 <strong>Important!</strong> Screenshot this QR code now! You will need it to login to SafeTrack next time.
+        </div>
+
+        <button class="login-now-btn" onclick="window.location.href='parent-login.html'">
+          Go to Login →
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    let db;
+    let currentStep = 1;
+    let photoDataUrl = null;
+    let selectedSchoolName = '';
+
+    async function init() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+      db = createClient(SUPABASE_URL, SUPABASE_KEY);
+      loadSchools();
+    }
+
+    async function loadSchools() {
+      const { data: schools } = await db.from('schools').select('*');
+      const select = document.getElementById('school_id');
+      if (schools) {
+        schools.forEach(school => {
+          const option = document.createElement('option');
+          option.value = school.id;
+          option.textContent = school.school_name;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    function updateProgress(step) {
+      const percent = (step / 4) * 100;
+      document.getElementById('progress-fill').style.width = percent + '%';
+      document.getElementById('progress-label').textContent = 'Step ' + step + ' of 4';
+    }
+
+    function goToStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + step).classList.add('active');
+      currentStep = step;
+      if (step <= 4) updateProgress(step);
+    }
+
+    window.goBack = function() {
+      if (currentStep > 1) {
+        goToStep(currentStep - 1);
+      } else {
+        window.location.href = 'parent-login.html';
+      }
+    }
+
+    // Step 1 — next
+    document.getElementById('next-1').addEventListener('click', function() {
+      const name = document.getElementById('full_name').value.trim();
+      const cls = document.getElementById('class').value.trim();
+      const schoolId = document.getElementById('school_id').value;
+      const schoolSelect = document.getElementById('school_id');
+      selectedSchoolName = schoolSelect.options[schoolSelect.selectedIndex]?.text || '';
+
+      if (!name || !cls || !schoolId) {
+        alert('Please fill in all fields!');
+        return;
+      }
+      goToStep(2);
+    });
+
+    // Photo handling
+    function handlePhoto(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        photoDataUrl = e.target.result;
+        const preview = document.getElementById('photo-preview');
+        preview.innerHTML = `<img src="${photoDataUrl}" alt="Child photo">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('camera-input').addEventListener('change', function(e) {
+      handlePhoto(e.target.files[0]);
+    });
+
+    document.getElementById('gallery-input').addEventListener('change', function(e) {
+      handlePhoto(e.target.files[0]);
+    });
+
+    // Step 2 — next
+    document.getElementById('next-2').addEventListener('click', function() {
+      if (!photoDataUrl) {
+        alert('Please take or choose a photo of your child!');
+        return;
+      }
+      goToStep(3);
+    });
+
+    // Step 3 — next
+    document.getElementById('next-3').addEventListener('click', function() {
+      const phone = document.getElementById('parent_phone').value.trim();
+      const whatsapp = document.getElementById('parent_whatsapp').value.trim();
+
+      if (!phone || !whatsapp) {
+        alert('Please fill in your phone numbers!');
+        return;
+      }
+
+      // Populate review
+      document.getElementById('review-photo').src = photoDataUrl;
+      document.getElementById('review-name').textContent = document.getElementById('full_name').value;
+      document.getElementById('review-class').textContent = document.getElementById('class').value;
+      document.getElementById('review-school').textContent = selectedSchoolName;
+      document.getElementById('review-phone').textContent = phone;
+      document.getElementById('review-whatsapp').textContent = whatsapp;
+
+      goToStep(4);
+    });
+
+    // Step 4 — submit
+    document.getElementById('submit-btn').addEventListener('click', async function() {
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = '⏳ Registering...';
+      btn.disabled = true;
+
+      const full_name = document.getElementById('full_name').value.trim();
+      const cls = document.getElementById('class').value.trim();
+      const school_id = parseInt(document.getElementById('school_id').value);
+      const parent_phone = document.getElementById('parent_phone').value.trim();
+      const parent_whatsapp = document.getElementById('parent_whatsapp').value.trim();
+      const parent_email = document.getElementById('parent_email').value.trim();
+      const qr_code = 'ST-' + Date.now();
+
+      const { error } = await db.from('students').insert([{
+        full_name,
+        class: cls,
+        school_name: selectedSchoolName,
+        school_id,
+        parent_phone,
+        parent_whatsapp,
+        parent_email: parent_email || null,
+        qr_code,
+        photo_url: photoDataUrl,
+        active: true
+      }]);
+
+      if (error) {
+        btn.textContent = '✅ Confirm & Register';
+        btn.disabled = false;
+        alert('Error: ' + error.message);
+        return;
+      }
+
+      // Show success
+      document.getElementById('success-qr').textContent = qr_code;
+      new QRCode(document.getElementById('qr-image'), {
+        text: qr_code,
+        width: 150,
+        height: 150,
+        colorDark: '#1b4332',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      goToStep(5);
+      document.querySelector('.progress-wrap').style.display = 'none';
+    });
+
+    init();
+  </script>
+</body>
+</html>
