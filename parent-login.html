@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafeTrack — Parent Login</title>
-<link rel="manifest" href="manifest-parent.json">
-<meta name="theme-color" content="#2d6a4f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SafeTrack">
+  <title>SafeTrack — Parent Portal</title>
+  <link rel="manifest" href="manifest-parent.json">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ST Parent">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #f0f7f4; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -15,15 +16,19 @@
     .logo h1 { color: #2d6a4f; font-size: 32px; }
     .logo p { color: #555; font-size: 15px; margin-top: 6px; }
     .box { background: white; padding: 32px 24px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-    .box h2 { font-size: 18px; color: #2d6a4f; margin-bottom: 6px; }
+    .box h2 { font-size: 20px; color: #2d6a4f; margin-bottom: 6px; }
     .box p { font-size: 13px; color: #777; margin-bottom: 20px; }
     label { display: block; margin-top: 16px; font-weight: bold; font-size: 14px; color: #333; }
     input { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
-    button { margin-top: 24px; width: 100%; padding: 14px; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
-    button:hover { background: #1b4332; }
-    #message { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; text-align: center; }
-    .error { background: #ffe5e5; color: #9b2226; }
-    .help { margin-top: 20px; text-align: center; font-size: 13px; color: #777; }
+    .login-btn { margin-top: 24px; width: 100%; padding: 14px; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+    .login-btn:hover { background: #1b4332; }
+    .divider { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
+    .divider hr { flex: 1; border: none; border-top: 1px solid #eee; }
+    .divider span { color: #aaa; font-size: 13px; }
+    .signup-btn { width: 100%; padding: 14px; background: white; color: #2d6a4f; border: 2px solid #2d6a4f; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+    .signup-btn:hover { background: #f0f7f4; }
+    #message { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; text-align: center; background: #ffe5e5; color: #9b2226; }
+    .help { margin-top: 20px; text-align: center; font-size: 12px; color: #999; }
   </style>
 </head>
 <body>
@@ -34,31 +39,40 @@
   </div>
 
   <div class="box">
-    <h2>Welcome, Parent!</h2>
-    <p>Login with your phone number and your child's QR code from their ID card</p>
+    <h2>Welcome!</h2>
+    <p>Login with your phone number and your child's QR code</p>
 
     <label>Your Phone Number</label>
     <input type="tel" id="phone" placeholder="e.g. 08012345678">
 
     <label>Child's QR Code</label>
     <input type="text" id="qr_code" placeholder="e.g. ST-1780551394600">
-    <p style="font-size:12px; color:#999; margin-top:4px;">Found on your child's ID card booklet</p>
+    <p style="font-size:11px; color:#aaa; margin-top:4px;">📸 Check your screenshot from when you registered</p>
 
-    <button id="login-btn">Login</button>
+    <button class="login-btn" id="login-btn">Login</button>
 
     <div id="message"></div>
 
-    <div class="help">
-      Need help? Contact your school admin
+    <div class="divider">
+      <hr><span>New here?</span><hr>
     </div>
+
+    <button class="signup-btn" onclick="window.location.href='parent-register.html'">
+      Register My Child →
+    </button>
+
+    <div class="help">Need help? Contact your school admin</div>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  <script>
+    const SUPABASE_URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
+    let db;
 
-    const URL = 'https://nasixrwwzkzclwdcbaip.supabase.co';
-    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hc2l4cnd3emt6Y2x3ZGNiYWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTk1NDEsImV4cCI6MjA5NjA5NTU0MX0.4h2VWGMOPlBxcrATqAqPQK7yrhMQf26n8UIOET_aJeo';
-    const db = createClient(URL, KEY);
+    async function init() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+      db = createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
 
     document.getElementById('login-btn').addEventListener('click', async function() {
       const phone = document.getElementById('phone').value.trim();
@@ -81,7 +95,7 @@
       }
 
       if (data.parent_phone !== phone && data.parent_whatsapp !== phone) {
-        showMessage('Phone number does not match our records. Please contact your school.');
+        showMessage('Phone number does not match. Please check and try again.');
         return;
       }
 
@@ -97,9 +111,10 @@
     function showMessage(text) {
       const msg = document.getElementById('message');
       msg.textContent = text;
-      msg.className = 'error';
       msg.style.display = 'block';
     }
+
+    init();
   </script>
 </body>
 </html>
