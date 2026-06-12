@@ -350,7 +350,7 @@
             'Welcome welcome welcome ' + data.full_name + '! Today is going to be amazing!'
           ];
           speak(welcomes[Math.floor(Math.random() * welcomes.length)]);
-          showScanResult('✅ ' + data.full_name + ' safely arrived at ' + time, 'success');
+          showScanResult('✅ ' + data.full_name + ' arrived at ' + time, 'success');
           sendEmailNotification(data.full_name, data.parent_email, data.school_name, 'arrival');
           sendSMSNotification(data.full_name, data.parent_phone, data.school_name, 'arrival');
         } else {
@@ -361,7 +361,7 @@
             'Bye bye ' + data.full_name + '! Do not forget your homework! See you soon!'
           ];
           speak(goodbyes[Math.floor(Math.random() * goodbyes.length)]);
-          showScanResult('🚪 ' + data.full_name + ' safely departed at ' + time, 'success');
+          showScanResult('🚪 ' + data.full_name + ' departed at ' + time, 'success');
           sendEmailNotification(data.full_name, data.parent_email, data.school_name, 'departure');
           sendSMSNotification(data.full_name, data.parent_phone, data.school_name, 'departure');
         }
