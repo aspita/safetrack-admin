@@ -4,88 +4,152 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SafeTrack — Keeping Nigerian School Children Safe</title>
-<link rel="manifest" href="manifest-marketing.json">
-<meta name="theme-color" content="#2d6a4f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SafeTrack">
+  <link rel="manifest" href="manifest-marketing.json">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SafeTrack">
+  <meta name="description" content="SafeTrack is a real-time school safety system that notifies Nigerian parents the moment their child arrives or leaves school via SMS. Built for Nigerian schools.">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #fff; color: #333; }
 
     /* NAV */
-    nav { background: #2d6a4f; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
+    nav { background: #2d6a4f; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 100; }
     nav .logo { color: white; font-size: 22px; font-weight: bold; }
-    nav a { color: white; text-decoration: none; font-size: 14px; margin-left: 24px; opacity: 0.9; }
+    nav .nav-links { display: flex; flex-wrap: wrap; gap: 4px; }
+    nav a { color: white; text-decoration: none; font-size: 14px; margin-left: 20px; opacity: 0.9; }
     nav a:hover { opacity: 1; }
 
     /* HERO */
-    .hero { background: linear-gradient(135deg, #2d6a4f, #1b4332); color: white; text-align: center; padding: 80px 20px; }
-    .hero h1 { font-size: 40px; margin-bottom: 16px; line-height: 1.2; }
-    .hero p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: 0 auto 32px; line-height: 1.6; }
-    .hero .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-white { background: white; color: #2d6a4f; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; }
-    .btn-outline { border: 2px solid white; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; }
+    .hero { background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #1b4332 100%); color: white; text-align: center; padding: 80px 20px 60px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 30px); }
+    .hero-badge { background: rgba(255,255,255,0.15); color: white; font-size: 13px; padding: 6px 16px; border-radius: 20px; display: inline-block; margin-bottom: 20px; position: relative; }
+    .hero h1 { font-size: 42px; margin-bottom: 16px; line-height: 1.2; position: relative; }
+    .hero p { font-size: 18px; opacity: 0.9; max-width: 620px; margin: 0 auto 32px; line-height: 1.7; position: relative; }
+    .hero .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
+    .btn-white { background: white; color: #2d6a4f; padding: 16px 32px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 16px; }
+    .btn-white:hover { background: #f0f7f4; }
+    .btn-outline { border: 2px solid white; color: white; padding: 16px 32px; border-radius: 10px; text-decoration: none; font-size: 16px; }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+    /* TRUST BAR */
+    .trust-bar { background: #1b4332; color: rgba(255,255,255,0.8); text-align: center; padding: 14px 20px; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; }
+    .trust-item { display: flex; align-items: center; gap: 6px; }
 
     /* STATS */
-    .stats { background: #f9f9f9; padding: 40px 20px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 700px; margin: 0 auto; gap: 20px; text-align: center; }
-    .stat-item .number { font-size: 36px; font-weight: bold; color: #2d6a4f; }
-    .stat-item .label { font-size: 14px; color: #777; margin-top: 4px; }
+    .stats { background: #f9f9f9; padding: 50px 20px; }
+    .stats h2 { text-align: center; font-size: 14px; color: #999; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); max-width: 800px; margin: 0 auto; gap: 20px; text-align: center; }
+    .stat-item { background: white; border-radius: 12px; padding: 24px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-item .number { font-size: 40px; font-weight: bold; color: #2d6a4f; }
+    .stat-item .label { font-size: 13px; color: #777; margin-top: 6px; line-height: 1.4; }
 
     /* PROBLEM */
-    .problem { padding: 60px 20px; text-align: center; background: white; }
-    .problem h2 { font-size: 28px; color: #333; margin-bottom: 16px; }
-    .problem p { font-size: 16px; color: #555; max-width: 600px; margin: 0 auto; line-height: 1.7; }
+    .problem { padding: 70px 20px; text-align: center; background: white; }
+    .problem h2 { font-size: 30px; color: #333; margin-bottom: 20px; }
+    .problem p { font-size: 17px; color: #555; max-width: 650px; margin: 0 auto 16px; line-height: 1.8; }
+    .problem-highlight { background: #fff8e1; border-radius: 12px; padding: 20px 28px; max-width: 600px; margin: 24px auto 0; border-left: 4px solid #f4a261; text-align: left; font-size: 15px; color: #555; line-height: 1.7; }
 
     /* FEATURES */
-    .features { background: #f9f9f9; padding: 60px 20px; }
-    .features h2 { font-size: 28px; text-align: center; margin-bottom: 40px; color: #333; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); max-width: 900px; margin: 0 auto; gap: 24px; }
-    .feature-card { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-top: 4px solid #2d6a4f; }
-    .feature-card .icon { font-size: 36px; margin-bottom: 12px; }
-    .feature-card h3 { font-size: 18px; margin-bottom: 8px; color: #2d6a4f; }
-    .feature-card p { font-size: 14px; color: #666; line-height: 1.6; }
+    .features { background: #f9f9f9; padding: 70px 20px; }
+    .features h2 { font-size: 30px; text-align: center; margin-bottom: 12px; color: #333; }
+    .features .subtitle { text-align: center; font-size: 16px; color: #777; margin-bottom: 40px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 960px; margin: 0 auto; gap: 24px; }
+    .feature-card { background: white; border-radius: 14px; padding: 32px 28px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border-top: 4px solid #2d6a4f; transition: transform 0.2s; }
+    .feature-card:hover { transform: translateY(-4px); }
+    .feature-card .icon { font-size: 40px; margin-bottom: 16px; }
+    .feature-card h3 { font-size: 19px; margin-bottom: 10px; color: #2d6a4f; }
+    .feature-card p { font-size: 14px; color: #666; line-height: 1.7; }
 
     /* HOW IT WORKS */
-    .how { padding: 60px 20px; background: white; }
-    .how h2 { font-size: 28px; text-align: center; margin-bottom: 40px; color: #333; }
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 900px; margin: 0 auto; gap: 20px; }
-    .step { text-align: center; padding: 20px; }
-    .step .num { width: 48px; height: 48px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin: 0 auto 12px; }
-    .step h3 { font-size: 15px; margin-bottom: 8px; color: #333; }
-    .step p { font-size: 13px; color: #777; line-height: 1.5; }
+    .how { padding: 70px 20px; background: white; }
+    .how h2 { font-size: 30px; text-align: center; margin-bottom: 12px; color: #333; }
+    .how .subtitle { text-align: center; font-size: 16px; color: #777; margin-bottom: 48px; }
+    .steps-wrap { max-width: 900px; margin: 0 auto; }
+    .how-step { display: flex; gap: 24px; margin-bottom: 32px; align-items: flex-start; background: #f9f9f9; border-radius: 14px; padding: 24px; }
+    .how-step .num { width: 52px; height: 52px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; flex-shrink: 0; }
+    .how-step-content h3 { font-size: 17px; color: #333; margin-bottom: 6px; font-weight: bold; }
+    .how-step-content p { font-size: 14px; color: #666; line-height: 1.7; }
+
+    /* PARENT FLOW */
+    .parent-flow { background: #f0f7f4; padding: 70px 20px; }
+    .parent-flow h2 { font-size: 30px; text-align: center; margin-bottom: 12px; color: #333; }
+    .parent-flow .subtitle { text-align: center; font-size: 16px; color: #777; margin-bottom: 48px; }
+    .flow-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); max-width: 900px; margin: 0 auto; gap: 16px; }
+    .flow-step { background: white; border-radius: 14px; padding: 24px 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .flow-step .step-icon { font-size: 36px; margin-bottom: 12px; }
+    .flow-step .step-num { width: 28px; height: 28px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; margin: 0 auto 10px; }
+    .flow-step h3 { font-size: 14px; color: #2d6a4f; margin-bottom: 6px; font-weight: bold; }
+    .flow-step p { font-size: 12px; color: #777; line-height: 1.5; }
 
     /* WHO */
-    .who { background: #f9f9f9; padding: 60px 20px; }
-    .who h2 { font-size: 28px; text-align: center; margin-bottom: 40px; color: #333; }
-    .who-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 700px; margin: 0 auto; gap: 20px; }
-    .who-card { background: white; border-radius: 12px; padding: 24px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .who-card .icon { font-size: 36px; margin-bottom: 12px; }
-    .who-card h3 { font-size: 16px; color: #2d6a4f; margin-bottom: 8px; }
-    .who-card p { font-size: 13px; color: #666; line-height: 1.5; }
+    .who { background: white; padding: 70px 20px; }
+    .who h2 { font-size: 30px; text-align: center; margin-bottom: 12px; color: #333; }
+    .who .subtitle { text-align: center; font-size: 16px; color: #777; margin-bottom: 40px; }
+    .who-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); max-width: 800px; margin: 0 auto; gap: 20px; }
+    .who-card { border-radius: 14px; padding: 28px 24px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-top: 4px solid #2d6a4f; background: #f9f9f9; }
+    .who-card .icon { font-size: 40px; margin-bottom: 14px; }
+    .who-card h3 { font-size: 17px; color: #2d6a4f; margin-bottom: 8px; font-weight: bold; }
+    .who-card p { font-size: 13px; color: #666; line-height: 1.6; }
+
+    /* NOTIFICATIONS */
+    .notifications { background: #f9f9f9; padding: 70px 20px; }
+    .notifications h2 { font-size: 30px; text-align: center; margin-bottom: 12px; color: #333; }
+    .notifications .subtitle { text-align: center; font-size: 16px; color: #777; margin-bottom: 40px; }
+    .notif-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); max-width: 800px; margin: 0 auto 32px; gap: 20px; }
+    .notif-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .notif-card .icon { font-size: 32px; margin-bottom: 12px; }
+    .notif-card h3 { font-size: 16px; color: #2d6a4f; margin-bottom: 8px; font-weight: bold; }
+    .notif-card p { font-size: 13px; color: #666; line-height: 1.6; }
+    .sms-preview { background: #1b4332; border-radius: 14px; padding: 24px 28px; max-width: 600px; margin: 0 auto; }
+    .sms-preview h3 { color: rgba(255,255,255,0.7); font-size: 12px; letter-spacing: 2px; margin-bottom: 16px; }
+    .sms-bubble { background: white; border-radius: 10px 10px 10px 2px; padding: 14px 18px; margin-bottom: 12px; font-size: 14px; color: #333; line-height: 1.6; }
+    .sms-bubble.departure { border-radius: 10px 10px 2px 10px; background: #d8f3dc; }
+    .sms-time { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
 
     /* SECURITY */
-    .security { background: #2d6a4f; color: white; padding: 60px 20px; text-align: center; }
-    .security h2 { font-size: 28px; margin-bottom: 16px; }
-    .security p { font-size: 16px; opacity: 0.9; max-width: 600px; margin: 0 auto 32px; line-height: 1.7; }
-    .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); max-width: 700px; margin: 0 auto; gap: 16px; }
-    .security-item { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; }
-    .security-item .icon { font-size: 28px; margin-bottom: 8px; }
-    .security-item p { font-size: 13px; opacity: 0.9; }
+    .security { background: #2d6a4f; color: white; padding: 70px 20px; text-align: center; }
+    .security h2 { font-size: 30px; margin-bottom: 12px; }
+    .security .subtitle { font-size: 16px; opacity: 0.85; max-width: 600px; margin: 0 auto 48px; line-height: 1.7; }
+    .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 750px; margin: 0 auto; gap: 20px; }
+    .security-item { background: rgba(255,255,255,0.1); border-radius: 14px; padding: 28px 20px; }
+    .security-item .icon { font-size: 36px; margin-bottom: 12px; }
+    .security-item h3 { font-size: 16px; font-weight: bold; margin-bottom: 8px; }
+    .security-item p { font-size: 13px; opacity: 0.85; line-height: 1.6; }
+
+    /* VOICE FEATURE */
+    .voice { background: white; padding: 70px 20px; text-align: center; }
+    .voice h2 { font-size: 30px; margin-bottom: 12px; color: #333; }
+    .voice .subtitle { font-size: 16px; color: #777; max-width: 600px; margin: 0 auto 40px; line-height: 1.7; }
+    .voice-bubbles { max-width: 500px; margin: 0 auto; }
+    .voice-bubble { background: #f0f7f4; border-radius: 14px; padding: 16px 20px; margin-bottom: 12px; text-align: left; font-size: 15px; color: #1b4332; display: flex; align-items: center; gap: 12px; }
+    .voice-bubble .v-icon { font-size: 24px; flex-shrink: 0; }
 
     /* CONTACT */
-    .contact { padding: 60px 20px; background: white; text-align: center; }
-    .contact h2 { font-size: 28px; margin-bottom: 16px; color: #333; }
-    .contact p { font-size: 16px; color: #555; margin-bottom: 32px; }
-    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 600px; margin: 0 auto 32px; gap: 16px; }
-    .contact-item { background: #f9f9f9; border-radius: 10px; padding: 20px; }
-    .contact-item .icon { font-size: 28px; margin-bottom: 8px; }
-    .contact-item p { font-size: 14px; color: #555; }
-    .contact-item a { color: #2d6a4f; text-decoration: none; font-weight: bold; }
-    .cta-btn { display: inline-block; background: #2d6a4f; color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: bold; }
+    .contact { padding: 70px 20px; background: #f9f9f9; text-align: center; }
+    .contact h2 { font-size: 30px; margin-bottom: 12px; color: #333; }
+    .contact p { font-size: 16px; color: #555; margin-bottom: 40px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); max-width: 700px; margin: 0 auto 32px; gap: 16px; }
+    .contact-item { background: white; border-radius: 12px; padding: 24px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .contact-item .icon { font-size: 32px; margin-bottom: 10px; }
+    .contact-item p { font-size: 13px; color: #555; line-height: 1.6; }
+    .contact-item a { color: #2d6a4f; text-decoration: none; font-weight: bold; font-size: 14px; }
+    .cta-btn { display: inline-block; background: #2d6a4f; color: white; padding: 18px 48px; border-radius: 10px; text-decoration: none; font-size: 17px; font-weight: bold; }
+    .cta-btn:hover { background: #1b4332; }
 
     /* FOOTER */
-    footer { background: #1b4332; color: white; text-align: center; padding: 24px; font-size: 13px; opacity: 0.9; }
+    footer { background: #1b4332; color: white; text-align: center; padding: 32px 20px; }
+    footer p { font-size: 14px; opacity: 0.8; line-height: 1.8; }
+    footer .footer-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+    footer a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; }
+    footer a:hover { color: white; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 28px; }
+      nav { padding: 16px 20px; }
+      .trust-bar { gap: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -93,9 +157,10 @@
   <!-- NAV -->
   <nav>
     <div class="logo">🛡️ SafeTrack</div>
-    <div>
+    <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#how">How it works</a>
+      <a href="#parents">Parents</a>
       <a href="#contact">Contact</a>
       <a href="school-login.html">School Login</a>
     </div>
@@ -103,24 +168,38 @@
 
   <!-- HERO -->
   <div class="hero">
-    <h1>Keeping Nigerian School<br>Children Safe 🇳🇬</h1>
-    <p>SafeTrack is a real-time school safety system that notifies parents the moment their child arrives or leaves school — and secures every pickup with a PIN.</p>
+    <div class="hero-badge">🇳🇬 Built for Nigerian Schools</div>
+    <h1>Your Child is Safe.<br>You Will Know Instantly.</h1>
+    <p>SafeTrack sends parents an SMS the moment their child arrives or leaves school — every single day. No more wondering. No more worrying.</p>
     <div class="buttons">
-      <a href="school-login.html" class="btn-white">School Login</a>
-      <a href="#contact" class="btn-outline">Contact Us</a>
+      <a href="#contact" class="btn-white">Get SafeTrack for Your School</a>
+      <a href="parent-login.html" class="btn-outline">Parent Login</a>
     </div>
+  </div>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="trust-item">✅ Works on all Nigerian networks</div>
+    <div class="trust-item">✅ Any smartphone — no equipment needed</div>
+    <div class="trust-item">✅ SMS notifications in seconds</div>
+    <div class="trust-item">✅ 3 layers of security</div>
   </div>
 
   <!-- STATS -->
   <div class="stats">
+    <h2>Why schools choose SafeTrack</h2>
     <div class="stats-grid">
       <div class="stat-item">
         <div class="number">3</div>
-        <div class="label">Security Layers</div>
+        <div class="label">Independent Security Layers</div>
       </div>
       <div class="stat-item">
         <div class="number">30s</div>
-        <div class="label">Notification Speed</div>
+        <div class="label">Parent notified in seconds</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">60</div>
+        <div class="label">School days tracked per term</div>
       </div>
       <div class="stat-item">
         <div class="number">100%</div>
@@ -131,55 +210,135 @@
 
   <!-- PROBLEM -->
   <div class="problem">
-    <h2>The Problem We Are Solving</h2>
-    <p>Every day, thousands of Nigerian parents send their children to school without knowing exactly when they arrived or who picked them up. SafeTrack changes that — giving parents real-time peace of mind and schools a powerful security tool.</p>
+    <h2>The Problem Every Nigerian Parent Knows</h2>
+    <p>Every morning, parents drop their children at school and spend the whole day wondering — <strong>Did my child arrive safely? Who picked them up? Is my child okay?</strong></p>
+    <p>When something goes wrong — a child gets lost, picked up by the wrong person, or leaves school without permission — parents are the last to know.</p>
+    <div class="problem-highlight">
+      💡 <strong>SafeTrack solves this.</strong> The moment your child walks through the school gate and their ID card is scanned — you receive an SMS on your phone. Instantly. Every single day.
+    </div>
   </div>
 
   <!-- FEATURES -->
   <div class="features" id="features">
-    <h2>What SafeTrack Does</h2>
+    <h2>Everything SafeTrack Does</h2>
+    <p class="subtitle">One system. Everything your school needs to keep children safe.</p>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="icon">📷</div>
-        <h3>QR Code Scanning</h3>
-        <p>Each student has a unique QR code on their ID card. Staff scan it at the gate using any smartphone — no special equipment needed.</p>
+        <div class="icon">🪪</div>
+        <h3>Student ID Cards with QR Codes</h3>
+        <p>Every student gets a professional plastic ID card with their photo and a unique QR code. SafeTrack prints and delivers the cards to your school. No name or personal info is displayed on the card — it is all encrypted in the QR code for maximum security.</p>
       </div>
       <div class="feature-card">
-        <div class="icon">📱</div>
-        <h3>Instant Parent Notifications</h3>
-        <p>The moment a student is scanned, their parent receives an SMS and WhatsApp message with the exact time of arrival or departure.</p>
+        <div class="icon">📷</div>
+        <h3>Instant QR Code Scanning</h3>
+        <p>Gate staff use any smartphone to scan student ID cards as they arrive and depart. The system beeps, says the student's name out loud, and logs the exact time. No internet required — just a phone and a camera.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📲</div>
+        <h3>Automatic SMS to Parents</h3>
+        <p>The moment a student is scanned, their parent receives an SMS text message with the student's name, school name and exact time. Works on MTN, Airtel, Glo and 9mobile. No WhatsApp needed — just a regular phone number.</p>
       </div>
       <div class="feature-card">
         <div class="icon">🔐</div>
-        <h3>Secure Pickup PIN</h3>
-        <p>When someone else picks up a child, the parent generates a secure 6-digit PIN valid for 30 minutes. Staff verify the PIN and the pickup person's name before releasing the child.</p>
+        <h3>Secure Pickup PIN System</h3>
+        <p>When a parent sends someone else to pick up their child, they generate a secure 6-digit PIN from the SafeTrack app. The PIN expires in 30 minutes and can only be used once. Gate staff verify the PIN and the pickup person's name before releasing the child.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📊</div>
+        <h3>Full Attendance Records</h3>
+        <p>Every arrival and departure is automatically saved with the date and time. School admin can view today's attendance or check any previous date. Parents can also view their child's complete attendance history from the parent app.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🎙️</div>
+        <h3>Friendly Voice Greetings</h3>
+        <p>When a student is scanned, the system says their name out loud in a warm, child-friendly voice — <strong>"Welcome to school Amaka! Have a super day!"</strong> Students love it. It makes the school gate experience positive every morning.</p>
       </div>
     </div>
   </div>
 
   <!-- HOW IT WORKS -->
   <div class="how" id="how">
-    <h2>How It Works</h2>
-    <div class="steps">
-      <div class="step">
+    <h2>How SafeTrack Works</h2>
+    <p class="subtitle">Simple for schools. Simple for parents. Powerful for security.</p>
+    <div class="steps-wrap">
+      <div class="how-step">
         <div class="num">1</div>
-        <h3>School Onboards</h3>
-        <p>We register the school and all students. Each student gets a unique QR code ID card.</p>
+        <div class="how-step-content">
+          <h3>School signs up with SafeTrack</h3>
+          <p>Contact us and we set up your school on SafeTrack within 48 hours. Your school gets a private dashboard, a unique login and everything needed to get started.</p>
+        </div>
       </div>
-      <div class="step">
+      <div class="how-step">
         <div class="num">2</div>
-        <h3>Student Scans at Gate</h3>
-        <p>Staff scan the student's ID card QR code when they arrive or leave school.</p>
+        <div class="how-step-content">
+          <h3>Parents register their children</h3>
+          <p>Parents open the SafeTrack parent app on their phone, tap "Register My Child", fill in their child's details and take a passport photo. Registration is instant — no paperwork, no queues.</p>
+        </div>
       </div>
-      <div class="step">
+      <div class="how-step">
         <div class="num">3</div>
-        <h3>Parent Gets Notified</h3>
-        <p>Parent instantly receives SMS and WhatsApp message with the time and school name.</p>
+        <div class="how-step-content">
+          <h3>SafeTrack prints and delivers ID cards</h3>
+          <p>We print a professional plastic ID card for each registered student with their photo and unique QR code. Cards are delivered to the school within 48 hours of registration.</p>
+        </div>
       </div>
-      <div class="step">
+      <div class="how-step">
         <div class="num">4</div>
-        <h3>Pickup is Secured</h3>
-        <p>Parent generates a PIN for the pickup person. Staff verify PIN and name before releasing child.</p>
+        <div class="how-step-content">
+          <h3>Gate staff scan ID cards every day</h3>
+          <p>Every morning, gate staff open the SafeTrack Gate app on their smartphone and scan each student's ID card as they arrive. In the afternoon, they scan again as students depart.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="num">5</div>
+        <div class="how-step-content">
+          <h3>Parents receive SMS instantly</h3>
+          <p>The moment a student is scanned, their parent receives an SMS. Arrival in the morning. Departure in the afternoon. Every single school day — automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARENT FLOW -->
+  <div class="parent-flow" id="parents">
+    <h2>How Parents Use SafeTrack</h2>
+    <p class="subtitle">Simple enough for any parent — even with a basic phone.</p>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-icon">📱</div>
+        <h3>Open the App</h3>
+        <p>Open SafeTrack in your phone browser. No app store needed.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-icon">✍️</div>
+        <h3>Register Child</h3>
+        <p>Enter your child's name, class and school. Takes less than 5 minutes.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-icon">📸</div>
+        <h3>Take Photo</h3>
+        <p>Take a clear photo of your child for their ID card.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-icon">🪪</div>
+        <h3>Get ID Card</h3>
+        <p>SafeTrack prints and delivers the ID card to school within 48 hours.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-icon">📲</div>
+        <h3>Get SMS Daily</h3>
+        <p>Receive SMS every time your child arrives or leaves school.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">6</div>
+        <div class="step-icon">🔐</div>
+        <h3>Generate PIN</h3>
+        <p>Send someone to pick up your child? Generate a secure PIN instantly.</p>
       </div>
     </div>
   </div>
@@ -187,41 +346,100 @@
   <!-- WHO -->
   <div class="who">
     <h2>Who Uses SafeTrack?</h2>
+    <p class="subtitle">Designed for everyone involved in a child's school day.</p>
     <div class="who-grid">
       <div class="who-card">
         <div class="icon">🏫</div>
         <h3>Primary Schools</h3>
-        <p>Keep young children safe with real-time gate monitoring and secure pickup verification.</p>
+        <p>Keep young children safe with real-time gate monitoring. Know exactly who enters and leaves your school every day.</p>
       </div>
       <div class="who-card">
         <div class="icon">🎓</div>
         <h3>Secondary Schools</h3>
-        <p>Monitor student arrivals and departures while giving parents complete visibility.</p>
+        <p>Track student attendance automatically. Give parents full visibility of their teenager's school day without extra admin work.</p>
       </div>
       <div class="who-card">
         <div class="icon">👨‍👩‍👧</div>
         <h3>Parents</h3>
-        <p>Know exactly when your child arrives and leaves school every single day.</p>
+        <p>Know the moment your child arrives at school every morning and the moment they leave every afternoon. No more guessing. No more worrying.</p>
       </div>
+      <div class="who-card">
+        <div class="icon">👮</div>
+        <h3>Gate Security Staff</h3>
+        <p>A simple, easy-to-use app on any smartphone. Scan, verify and secure — no complicated training needed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="notifications">
+    <h2>Real-Time Parent Notifications</h2>
+    <p class="subtitle">Parents receive SMS instantly — no WhatsApp, no data needed. Just a regular phone number.</p>
+    <div class="notif-grid">
+      <div class="notif-card">
+        <div class="icon">📲</div>
+        <h3>SMS Text Message</h3>
+        <p>Delivered to any Nigerian number on MTN, Airtel, Glo or 9mobile. Works even on basic phones. No internet or data required to receive.</p>
+      </div>
+      <div class="notif-card">
+        <div class="icon">📧</div>
+        <h3>Email Notification</h3>
+        <p>Parents who provide an email address also receive a detailed email with the student's name, school, exact time and date of scan.</p>
+      </div>
+    </div>
+    <div class="sms-preview">
+      <h3>📱 EXAMPLE SMS MESSAGES PARENTS RECEIVE</h3>
+      <div class="sms-bubble">
+        <strong>N-Alert:</strong> Amaka Okonkwo has arrived at Greenfield Academy at 7:52 AM. Powered by SafeTrack
+      </div>
+      <div class="sms-time">Delivered ✓✓ · 7:52 AM</div>
+      <br>
+      <div class="sms-bubble departure">
+        <strong>N-Alert:</strong> Amaka Okonkwo has departed Greenfield Academy at 2:30 PM. Powered by SafeTrack
+      </div>
+      <div class="sms-time">Delivered ✓✓ · 2:30 PM</div>
     </div>
   </div>
 
   <!-- SECURITY -->
   <div class="security">
-    <h2>Three Layers of Security</h2>
-    <p>SafeTrack is the only school safety system in Nigeria with three independent security layers protecting every child.</p>
+    <h2>🔒 Three Layers of Security</h2>
+    <p class="subtitle">SafeTrack is the only school safety system in Nigeria with three independent security layers. Even if one layer fails — the other two still protect your child.</p>
     <div class="security-grid">
       <div class="security-item">
         <div class="icon">🪪</div>
-        <p><strong>QR Code</strong><br>Unique to every student. Cannot be duplicated.</p>
+        <h3>Layer 1 — QR Code</h3>
+        <p>Every student has a unique QR code that cannot be copied or duplicated. If a card is lost, it is deactivated immediately from the system.</p>
       </div>
       <div class="security-item">
         <div class="icon">⏱️</div>
-        <p><strong>Time-Limited PIN</strong><br>Expires in 30 minutes. Cannot be reused.</p>
+        <h3>Layer 2 — Time PIN</h3>
+        <p>Pickup PINs expire after 30 minutes and can only be used once. Even if the PIN is stolen or shared — it becomes useless within minutes.</p>
       </div>
       <div class="security-item">
         <div class="icon">👤</div>
-        <p><strong>Name Verification</strong><br>Staff confirm pickup person's name matches the PIN.</p>
+        <h3>Layer 3 — Name Check</h3>
+        <p>Gate staff ask the pickup person to state their name before checking the system. If the name does not match — the child is not released. Simple human security.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOICE -->
+  <div class="voice">
+    <h2>🎙️ A Friendly Welcome Every Morning</h2>
+    <p class="subtitle">When a student scans their ID card, SafeTrack says their name out loud in a warm, child-friendly female voice. Students love it. It makes coming to school exciting.</p>
+    <div class="voice-bubbles">
+      <div class="voice-bubble">
+        <span class="v-icon">🟢</span>
+        <span><strong>Arrival:</strong> "Yay! Welcome to school Amaka! Ready to learn today?"</span>
+      </div>
+      <div class="voice-bubble">
+        <span class="v-icon">🔴</span>
+        <span><strong>Departure:</strong> "Bye bye Emeka! You were amazing today! See you tomorrow!"</span>
+      </div>
+      <div class="voice-bubble">
+        <span class="v-icon">✅</span>
+        <span><strong>Pickup:</strong> "Access granted! Please release Amaka to Uncle Emeka."</span>
       </div>
     </div>
   </div>
@@ -229,31 +447,37 @@
   <!-- CONTACT -->
   <div class="contact" id="contact">
     <h2>Get SafeTrack for Your School</h2>
-    <p>We onboard schools manually to ensure everything is set up perfectly. Contact us today to get started.</p>
-   <div class="contact-grid">
-  <div class="contact-item">
-    <div class="icon">📧</div>
-    <p>Email<br><a href="mailto:info@aspitaprobs.com">info@aspitaprobs.com</a></p>
-  </div>
-  <div class="contact-item">
-    <div class="icon">📱</div>
-    <p>Phone<br><a href="tel:+2349166581100">+234 916 658 1100</a></p>
-  </div>
-  <div class="contact-item">
-    <div class="icon">💬</div>
-    <p>WhatsApp<br><a href="https://wa.me/2349166581100">Chat with us</a></p>
-  </div>
-  <div class="contact-item">
-    <div class="icon">📍</div>
-    <p>Location<br>Lagos, Nigeria 🇳🇬</p>
-  </div>
-</div>
-    <a href="mailto:aspitasproplimited@gmail.com" class="cta-btn">Contact Us Today</a>
+    <p>Contact us today and we will set up your school within 48 hours. We handle everything — ID cards, setup and training.</p>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="icon">📧</div>
+        <p>Email<br><a href="mailto:aspitasproplimited@gmail.com">aspitasproplimited@gmail.com</a></p>
+      </div>
+      <div class="contact-item">
+        <div class="icon">📱</div>
+        <p>Phone<br><a href="tel:+2349166581100">+234 916 658 1100</a></p>
+      </div>
+      <div class="contact-item">
+        <div class="icon">💬</div>
+        <p>WhatsApp<br><a href="https://wa.me/2349166581100">Chat with us now</a></p>
+      </div>
+      <div class="contact-item">
+        <div class="icon">📍</div>
+        <p>Location<br>Lagos, Nigeria 🇳🇬</p>
+      </div>
+    </div>
+    <a href="https://wa.me/2349166581100" class="cta-btn">💬 WhatsApp Us Now</a>
   </div>
 
   <!-- FOOTER -->
   <footer>
-    © 2026 SafeTrack by Aspita Probs Limited — Keeping Nigerian School Children Safe 🇳🇬
+    <p>© 2026 SafeTrack by Aspita Probs Limited — Keeping Nigerian School Children Safe 🇳🇬</p>
+    <div class="footer-links">
+      <a href="school-login.html">School Login</a>
+      <a href="parent-login.html">Parent Login</a>
+      <a href="guide.html">School Guide</a>
+      <a href="mailto:aspitasproplimited@gmail.com">Contact Us</a>
+    </div>
   </footer>
 
 </body>
