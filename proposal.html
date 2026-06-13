@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeTrack — School Safety Proposal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+
+    .page { max-width: 800px; margin: 30px auto; background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+
+    /* COVER */
+    .cover { background: linear-gradient(135deg, #1b4332, #2d6a4f); color: white; padding: 60px 50px; position: relative; overflow: hidden; }
+    .cover::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 30px); }
+    .cover-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 60px; position: relative; }
+    .cover-logo { font-size: 24px; font-weight: bold; }
+    .cover-date { font-size: 13px; opacity: 0.7; text-align: right; }
+    .cover-badge { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 6px 16px; font-size: 12px; display: inline-block; margin-bottom: 20px; position: relative; }
+    .cover h1 { font-size: 38px; line-height: 1.2; margin-bottom: 16px; position: relative; }
+    .cover h1 span { opacity: 0.7; font-size: 24px; display: block; margin-top: 8px; }
+    .cover p { font-size: 16px; opacity: 0.85; line-height: 1.7; max-width: 500px; position: relative; margin-bottom: 40px; }
+    .cover-to { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px 24px; position: relative; display: inline-block; min-width: 300px; }
+    .cover-to p { font-size: 12px; opacity: 0.6; margin-bottom: 4px; }
+    .cover-to h3 { font-size: 18px; font-weight: bold; }
+    .cover-to h4 { font-size: 14px; opacity: 0.8; margin-top: 2px; }
+
+    /* SECTIONS */
+    .section { padding: 40px 50px; border-bottom: 1px solid #f0f0f0; }
+    .section:last-child { border-bottom: none; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .section-icon { width: 40px; height: 40px; background: #2d6a4f; color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .section h2 { font-size: 22px; color: #1b4332; }
+    .section p { font-size: 14px; color: #555; line-height: 1.8; margin-bottom: 12px; }
+
+    /* PROBLEM */
+    .problem-box { background: #fff8e1; border-radius: 12px; padding: 20px 24px; border-left: 4px solid #f4a261; margin: 16px 0; }
+    .problem-box p { font-size: 14px; color: #555; line-height: 1.8; margin: 0; }
+
+    /* SOLUTION GRID */
+    .solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .solution-item { background: #f0f7f4; border-radius: 10px; padding: 16px; }
+    .solution-item .s-icon { font-size: 24px; margin-bottom: 8px; }
+    .solution-item h4 { font-size: 14px; color: #1b4332; margin-bottom: 4px; font-weight: bold; }
+    .solution-item p { font-size: 13px; color: #666; line-height: 1.5; margin: 0; }
+
+    /* HOW IT WORKS */
+    .how-step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+    .how-num { width: 36px; height: 36px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; flex-shrink: 0; }
+    .how-content h4 { font-size: 15px; color: #333; margin-bottom: 4px; font-weight: bold; }
+    .how-content p { font-size: 13px; color: #666; line-height: 1.6; margin: 0; }
+
+    /* SMS PREVIEW */
+    .sms-preview { background: #1b4332; border-radius: 12px; padding: 20px 24px; margin: 16px 0; }
+    .sms-preview h4 { color: rgba(255,255,255,0.6); font-size: 11px; letter-spacing: 2px; margin-bottom: 12px; }
+    .sms-bubble { background: white; border-radius: 10px 10px 10px 2px; padding: 12px 16px; margin-bottom: 10px; font-size: 13px; color: #333; line-height: 1.6; }
+    .sms-bubble.out { background: #d8f3dc; border-radius: 10px 10px 2px 10px; }
+    .sms-time { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+    /* SECURITY */
+    .security-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+    .security-item { background: #f9f9f9; border-radius: 10px; padding: 16px; text-align: center; border-top: 3px solid #2d6a4f; }
+    .security-item .s-icon { font-size: 28px; margin-bottom: 8px; }
+    .security-item h4 { font-size: 13px; color: #1b4332; margin-bottom: 4px; font-weight: bold; }
+    .security-item p { font-size: 12px; color: #666; line-height: 1.5; margin: 0; }
+
+    /* PRICING */
+    .pricing-table { width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; }
+    .pricing-table th { background: #1b4332; color: white; padding: 14px 16px; text-align: left; font-size: 14px; }
+    .pricing-table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+    .pricing-table tr:last-child td { border-bottom: none; background: #f0f7f4; font-weight: bold; }
+    .pricing-note { background: #d8f3dc; border-radius: 10px; padding: 16px 20px; margin: 16px 0; font-size: 14px; color: #1b4332; line-height: 1.7; }
+
+    /* WHAT WE PROVIDE */
+    .provide-list { list-style: none; margin: 16px 0; }
+    .provide-list li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #555; line-height: 1.6; }
+    .provide-list li:last-child { border-bottom: none; }
+    .provide-list li .check { color: #2d6a4f; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+    /* NEXT STEPS */
+    .next-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .next-step { background: #f0f7f4; border-radius: 10px; padding: 20px; }
+    .next-step .step-num { width: 32px; height: 32px; background: #2d6a4f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; margin-bottom: 10px; }
+    .next-step h4 { font-size: 14px; color: #1b4332; margin-bottom: 6px; font-weight: bold; }
+    .next-step p { font-size: 13px; color: #666; line-height: 1.5; margin: 0; }
+
+    /* CTA */
+    .cta { background: linear-gradient(135deg, #1b4332, #2d6a4f); color: white; padding: 40px 50px; text-align: center; }
+    .cta h2 { font-size: 26px; margin-bottom: 12px; }
+    .cta p { font-size: 15px; opacity: 0.85; margin-bottom: 28px; line-height: 1.7; }
+    .cta-contacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 500px; margin: 0 auto 28px; }
+    .cta-contact { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; }
+    .cta-contact .icon { font-size: 24px; margin-bottom: 6px; }
+    .cta-contact p { font-size: 12px; opacity: 0.7; margin-bottom: 2px; }
+    .cta-contact a { color: white; text-decoration: none; font-size: 13px; font-weight: bold; }
+    .cta-btn { background: white; color: #1b4332; padding: 16px 40px; border-radius: 10px; text-decoration: none; font-size: 16px; font-weight: bold; display: inline-block; }
+
+    /* FOOTER */
+    .footer { background: #f9f9f9; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; }
+    .footer p { font-size: 12px; color: #aaa; }
+
+    @media print {
+      body { background: white; }
+      .page { box-shadow: none; margin: 0; }
+      .print-btn { display: none !important; }
+    }
+
+    @media (max-width: 600px) {
+      .cover { padding: 40px 24px; }
+      .section { padding: 32px 24px; }
+      .solution-grid { grid-template-columns: 1fr; }
+      .security-grid { grid-template-columns: 1fr; }
+      .next-steps { grid-template-columns: 1fr; }
+      .cta-contacts { grid-template-columns: 1fr; }
+      .cover h1 { font-size: 28px; }
+      .footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print button - hidden on print -->
+  <div style="text-align:center; padding:16px; background:#f5f5f5;" class="print-btn">
+    <button onclick="window.print()" style="background:#2d6a4f; color:white; border:none; padding:12px 32px; border-radius:8px; font-size:15px; cursor:pointer; margin-right:10px;">🖨️ Print Proposal</button>
+    <button onclick="copyLink()" style="background:white; color:#2d6a4f; border:2px solid #2d6a4f; padding:12px 32px; border-radius:8px; font-size:15px; cursor:pointer;">🔗 Copy Link to Share</button>
+  </div>
+
+  <div class="page">
+
+    <!-- COVER PAGE -->
+    <div class="cover">
+      <div class="cover-top">
+        <div class="cover-logo">🛡️ SafeTrack</div>
+        <div class="cover-date">
+          <div>Proposal Date</div>
+          <div id="proposal-date" style="font-weight:bold; margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="cover-badge">🇳🇬 Built for Nigerian Private Schools</div>
+      <h1>
+        School Safety Proposal
+        <span>Real-Time Student Tracking & Parent Notification System</span>
+      </h1>
+      <p>A professional safety solution that notifies parents the moment their child arrives or leaves school — and secures every pickup with a PIN.</p>
+      <div class="cover-to">
+        <p>SUBMITTED TO</p>
+        <h3>The School Principal / Proprietor</h3>
+        <h4>Private School — Nigeria</h4>
+      </div>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📋</div>
+        <h2>Executive Summary</h2>
+      </div>
+      <p>SafeTrack is a school safety and attendance tracking system designed specifically for Nigerian private schools. It solves one of the most pressing concerns of Nigerian parents — <strong>not knowing if their child arrived safely at school or who picked them up.</strong></p>
+      <p>Using QR code technology, SafeTrack automatically sends an SMS to parents the moment their child's ID card is scanned at the school gate — on arrival and on departure. Every single school day.</p>
+      <p>SafeTrack also includes a secure Pickup PIN system that ensures no child can ever be collected by an unauthorized person — giving schools and parents complete peace of mind.</p>
+    </div>
+
+    <!-- THE PROBLEM -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">⚠️</div>
+        <h2>The Problem We Are Solving</h2>
+      </div>
+      <p>Every day, thousands of Nigerian parents face the same anxiety — they send their children to school in the morning and spend the entire day wondering:</p>
+      <div class="problem-box">
+        <p>❓ <strong>Did my child arrive safely?</strong><br>
+        ❓ <strong>Who picked up my child after school?</strong><br>
+        ❓ <strong>Was my child at school today?</strong><br>
+        ❓ <strong>What if an unauthorized person took my child?</strong></p>
+      </div>
+      <p>Traditional school registers and manual sign-in sheets are unreliable, time consuming and give parents no real-time information. SafeTrack changes all of this with technology that works automatically — every single day.</p>
+    </div>
+
+    <!-- THE SOLUTION -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">✅</div>
+        <h2>The SafeTrack Solution</h2>
+      </div>
+      <p>SafeTrack gives every student a unique QR code on their ID card. When gate staff scan the card at the school gate, the system automatically:</p>
+      <div class="solution-grid">
+        <div class="solution-item">
+          <div class="s-icon">📲</div>
+          <h4>Sends SMS to Parent</h4>
+          <p>Parent receives an instant text message with the student's name, school and exact time of arrival or departure.</p>
+        </div>
+        <div class="solution-item">
+          <div class="s-icon">📊</div>
+          <h4>Logs Attendance</h4>
+          <p>Every scan is permanently saved with date and time. School admin can view full attendance history for any date.</p>
+        </div>
+        <div class="solution-item">
+          <div class="s-icon">🔐</div>
+          <h4>Secures Pickup</h4>
+          <p>Parents generate a secure 6-digit PIN for authorized pickup persons. PIN expires in 30 minutes and is single use.</p>
+        </div>
+        <div class="solution-item">
+          <div class="s-icon">🎙️</div>
+          <h4>Voice Greeting</h4>
+          <p>The system says each student's name out loud when scanned — "Welcome to school Amaka! Have a super day!"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMS PREVIEW -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📱</div>
+        <h2>What Parents Receive</h2>
+      </div>
+      <p>The moment a student's ID card is scanned at the gate, their parent receives an SMS on their phone — instantly. Works on all Nigerian networks: MTN, Airtel, Glo and 9mobile.</p>
+      <div class="sms-preview">
+        <h4>📱 EXAMPLE SMS MESSAGES</h4>
+        <div class="sms-bubble">
+          <strong>N-Alert:</strong> Amaka Okonkwo has safely arrived at Greenfield Academy at 7:52 AM. SafeTrack Alert.
+        </div>
+        <div class="sms-time">Delivered ✓✓ · 7:52 AM</div>
+        <br>
+        <div class="sms-bubble out">
+          <strong>N-Alert:</strong> Amaka Okonkwo has safely departed Greenfield Academy at 2:30 PM. SafeTrack Alert.
+        </div>
+        <div class="sms-time">Delivered ✓✓ · 2:30 PM</div>
+      </div>
+      <p style="margin-top:12px; font-size:13px; color:#999;">Parents also receive email notifications if they provide an email address during registration.</p>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">⚙️</div>
+        <h2>How It Works — Step by Step</h2>
+      </div>
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-content">
+          <h4>School signs up with SafeTrack</h4>
+          <p>We set up your school on SafeTrack within 48 hours. Your school receives a private dashboard, unique login credentials and full access to the system.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-content">
+          <h4>Parents register their children</h4>
+          <p>Parents open the SafeTrack parent app on their phone and register their child in less than 5 minutes. They enter the child's name, class, take a passport photo and provide their contact details. No paperwork. No queues.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-content">
+          <h4>SafeTrack prints and delivers ID cards</h4>
+          <p>We print a professional plastic ID card for every registered student — with their passport photo and a unique QR code. Cards are delivered to the school within 48 hours of registration.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-content">
+          <h4>Gate staff scan ID cards every day</h4>
+          <p>Gate staff use any regular smartphone to scan student ID cards at the gate — every morning on arrival and every afternoon on departure. The system beeps, announces the student's name and logs the time automatically.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">5</div>
+        <div class="how-content">
+          <h4>Parents receive SMS instantly</h4>
+          <p>Every parent receives an SMS the moment their child is scanned. Arrival in the morning. Departure in the afternoon. Every single school day — completely automatic.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- THREE LAYER SECURITY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🔒</div>
+        <h2>Three Layers of Security</h2>
+      </div>
+      <p>SafeTrack is the only school safety system in Nigeria with three independent security layers protecting every child simultaneously.</p>
+      <div class="security-grid">
+        <div class="security-item">
+          <div class="s-icon">🪪</div>
+          <h4>Layer 1 — QR Code</h4>
+          <p>Unique to every student. Cannot be copied. Lost cards are deactivated instantly.</p>
+        </div>
+        <div class="security-item">
+          <div class="s-icon">⏱️</div>
+          <h4>Layer 2 — Time PIN</h4>
+          <p>Pickup PINs expire in 30 minutes and can only be used once. Stolen PINs become useless fast.</p>
+        </div>
+        <div class="security-item">
+          <div class="s-icon">👤</div>
+          <h4>Layer 3 — Name Check</h4>
+          <p>Staff ask pickup person's name before checking screen. Name must match — or child is not released.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHAT WE PROVIDE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📦</div>
+        <h2>What SafeTrack Provides</h2>
+      </div>
+      <ul class="provide-list">
+        <li><span class="check">✅</span> <div><strong>Printed plastic ID cards</strong> — Professional ID cards with student photo and QR code. Printed and delivered by SafeTrack to your school within 48 hours of registration.</div></li>
+        <li><span class="check">✅</span> <div><strong>Gate Scanner App</strong> — Simple smartphone app for gate staff. Works on any Android or iPhone. No special equipment needed.</div></li>
+        <li><span class="check">✅</span> <div><strong>School Admin Dashboard</strong> — Private dashboard for your admin to view all students, today's attendance, historical records and manage student accounts.</div></li>
+        <li><span class="check">✅</span> <div><strong>Parent App</strong> — Simple app for parents to register their child, view attendance history, check registration status and generate pickup PINs.</div></li>
+        <li><span class="check">✅</span> <div><strong>SMS Notifications</strong> — Automatic SMS to parents every time their child arrives or departs. Works on all Nigerian networks.</div></li>
+        <li><span class="check">✅</span> <div><strong>Email Notifications</strong> — Additional email alerts for parents who provide an email address.</div></li>
+        <li><span class="check">✅</span> <div><strong>Pickup PIN Security</strong> — Secure time-limited PINs for authorized child pickup. Full name verification at the gate.</div></li>
+        <li><span class="check">✅</span> <div><strong>Staff Training</strong> — SafeTrack trains your gate staff on how to use the system. Ongoing WhatsApp and phone support included.</div></li>
+        <li><span class="check">✅</span> <div><strong>Full Attendance Records</strong> — Every arrival and departure saved permanently. Filter by any date. Export records anytime.</div></li>
+      </ul>
+    </div>
+
+    <!-- PRICING -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">💰</div>
+        <h2>Investment</h2>
+      </div>
+      <p>SafeTrack operates on a simple, transparent per-student pricing model. There are no hidden fees and no complicated contracts.</p>
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Cost</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🪪 Student ID Card + Onboarding</td>
+            <td>₦3,500 per student</td>
+            <td>One time only. Includes printed ID card, full setup and parent app access.</td>
+          </tr>
+          <tr>
+            <td>📱 Term Subscription</td>
+            <td>₦4,000 per student/term</td>
+            <td>Billed each term. Includes all SMS, email notifications and system access.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pricing-note">
+        📌 <strong>Note:</strong> These are SafeTrack's charges to your school. What your school charges parents is entirely your decision. Most schools simply add the SafeTrack fee to their existing school fees — parents pay it as part of normal school fees with no extra collection needed.
+      </div>
+
+      <p style="font-size:14px; color:#555; line-height:1.8; margin-top:16px;"><strong>Example with 200 students:</strong></p>
+      <table class="pricing-table" style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Calculation</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ID Cards + Onboarding</td>
+            <td>200 × ₦3,500</td>
+            <td>₦700,000 (one time)</td>
+          </tr>
+          <tr>
+            <td>Per Term</td>
+            <td>200 × ₦4,000</td>
+            <td>₦800,000/term</td>
+          </tr>
+          <tr>
+            <td>Per Year (3 terms)</td>
+            <td>₦800,000 × 3</td>
+            <td>₦2,400,000/year</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🚀</div>
+        <h2>How to Get Started</h2>
+      </div>
+      <p>Getting SafeTrack running in your school is simple. We handle everything — your school just needs to say yes.</p>
+      <div class="next-steps">
+        <div class="next-step">
+          <div class="step-num">1</div>
+          <h4>Contact Us</h4>
+          <p>Call, WhatsApp or email us. We will answer all your questions and schedule a live demo at your school.</p>
+        </div>
+        <div class="next-step">
+          <div class="step-num">2</div>
+          <h4>Sign Agreement</h4>
+          <p>We sign a simple service agreement. No complicated contracts. Clear terms and conditions.</p>
+        </div>
+        <div class="next-step">
+          <div class="step-num">3</div>
+          <h4>Parents Register</h4>
+          <p>Parents register their children on the SafeTrack app. Takes less than 5 minutes per child.</p>
+        </div>
+        <div class="next-step">
+          <div class="step-num">4</div>
+          <h4>ID Cards Delivered</h4>
+          <p>We print and deliver all ID cards to your school within 48 hours of registration.</p>
+        </div>
+        <div class="next-step">
+          <div class="step-num">5</div>
+          <h4>Staff Training</h4>
+          <p>We train your gate staff on using the scanner app. Takes less than 30 minutes.</p>
+        </div>
+        <div class="next-step">
+          <div class="step-num">6</div>
+          <h4>Go Live!</h4>
+          <p>From day one — parents receive SMS every time their child arrives or leaves school.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+      <h2>Ready to Make Your School Safer?</h2>
+      <p>Join the growing number of Nigerian private schools protecting their students with SafeTrack. Contact us today and we will set up your school within 48 hours.</p>
+      <div class="cta-contacts">
+        <div class="cta-contact">
+          <div class="icon">📱</div>
+          <p>Call / WhatsApp</p>
+          <a href="tel:+2349166581100">+234 916 658 1100</a>
+        </div>
+        <div class="cta-contact">
+          <div class="icon">📧</div>
+          <p>Email</p>
+          <a href="mailto:aspitasproplimited@gmail.com">aspitasproplimited@gmail.com</a>
+        </div>
+        <div class="cta-contact">
+          <div class="icon">🌐</div>
+          <p>Website</p>
+          <a href="https://safetrack-admin.vercel.app/safetrack.html">safetrack-admin.vercel.app</a>
+        </div>
+      </div>
+      <a href="https://wa.me/2349166581100" class="cta-btn">💬 WhatsApp Us Now</a>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <p>© 2026 SafeTrack by Aspita Probs Limited</p>
+      <p>Keeping Nigerian School Children Safe 🇳🇬</p>
+    </div>
+
+  </div>
+
+  <script>
+    // Set today's date
+    const today = new Date();
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    document.getElementById('proposal-date').textContent = today.toLocaleDateString('en-NG', options);
+
+    // Copy link function
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert('Link copied! You can now paste it in WhatsApp or email.');
+      });
+    }
+  </script>
+
+</body>
+</html>
