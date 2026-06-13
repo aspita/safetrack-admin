@@ -111,8 +111,8 @@
         });
 
         const message = scanType === 'arrival'
-          ? `${studentName} has arrived at ${schoolName} at ${time}. Powered by SafeTrack`
-          : `${studentName} has departed ${schoolName} at ${time}. Powered by SafeTrack`;
+  ? `${studentName} has safely arrived at ${schoolName} at ${time}. SafeTrack Alert.`
+  : `${studentName} has safely departed ${schoolName} at ${time}. SafeTrack Alert.`;
 
         console.log('Sending SMS via Edge Function...');
 
